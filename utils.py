@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+from hierarchicalforecast.utils import aggregate
+
 
 def read_csv_files(material):
     path = f"dados/{material}"
@@ -126,6 +129,15 @@ def plot_produtos_in_cds(df, x='mes', product_col='produto', cd_col='centro_dist
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
     return fig, axs
+
+def remove_materials_no_sales(df):
+    df = df[~df['material'].isin(
+            [
+                'd2d02f574554bb7284161539e60d251b',
+                '37227479c0bd1ef74da961eafb87f13b',
+                '395be8e13e6a427d3dc713212d59539f'
+            ])]
+    return df
 
 def plot_time_series_cds_products_by_stores(
     df,
@@ -690,3 +702,47 @@ def violin_plot_material_store_sales(df, product, materials=None, top_n_stores=4
 
     plt.show()
     return
+
+def hierarchical_aggregation(df, spec, columns=None, ds='mes', y='venda_unidades'):
+    if columns:
+        df_h = df[columns].copy()
+    df_h = df_h.dropna()
+    df_h = df_h.rename(columns={ds: 'ds', y: 'y'})
+    df_h['total'] = 'total'
+    df_h['ds'] = pd.to_datetime(df_h['ds'])
+    df_h = df_h.sort_values('ds')
+    
+    y_hier, S, tags = aggregate(
+        df=df_h,
+        spec=spec
+    )
+
+    print("Níveis criados:")
+    for k, v in tags.items():
+        print(f"{k}: {len(v)} séries")
+    return y_hier, S, tags
+
+def return_minimum_length(y_hier,S,tags,min_length=24):
+    print(f"Filtrando séries com pelo menos {min_length} pontos...")
+    series_lengths = y_hier.groupby('unique_id')['ds'].count().sort_values()
+    print(f"Número de séries antes do filtro: {len(series_lengths)}")
+    valid_ids = series_lengths[series_lengths >= min_length].index
+    y_hier_filtered = y_hier[y_hier['unique_id'].isin(valid_ids)]
+    print(f"Número de séries após o filtro: {len(valid_ids)}")
+    bottom_tag = list(tags.keys())[-1]
+    bottom_ids = tags[bottom_tag]
+    valid_bottoms = [id_ for id_ in bottom_ids if id_ in valid_ids]
+    # Filtra S: assume S.index são todos níveis, S.columns são bottoms
+    S_filtered = S[valid_bottoms]  # Filtra colunas
+    # Atualiza tags: pra cada level, filtra os que sobraram em valid_ids
+    tags_filtered = {k: [id_ for id_ in v if id_ in valid_ids] for k, v in tags.items()}
+    return y_hier_filtered,S_filtered,tags_filtered
+
+def remove_time_series_min_length(y, min_length):
+    group_cols = ['centro_distribuicao','regiao_loja','clima_loja','loja','produto','material','sku']
+    # conta observações por série (combinação das colunas)
+    counts = y.groupby(group_cols).size().reset_index(name='n_obs')
+    # mantém apenas séries com pelo menos min_length observações
+    valid = counts[counts['n_obs'] >= min_length][group_cols]
+    # filtra o dataframe original pelas séries válidas
+    return y.merge(valid, on=group_cols, how='inner')
