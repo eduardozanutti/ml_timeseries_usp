@@ -1,0 +1,27 @@
+data:
+  raw_path: data/raw/
+keys: ['material', 'loja']
+exclude_materials: [123, 456]  # Lista de materiais a excluir
+min_time_series_length: 24
+dtypes:
+  mes: datetime
+  marca: str
+  idade_loja: int
+  # etc.
+hierarchical: false  # Mude para true para ativar
+hierarchical_spec:
+  - ['total']
+  - ['total','centro_distribuicao']
+  #- ['total','centro_distribuicao','regiao_loja']
+  #- ['total','centro_distribuicao','regiao_loja','clima_loja']
+  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja']
+  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto']
+  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material']
+  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material','sku']
+
+columns_selected: ['mes', 'venda_unidades']
+ds_col: mes
+y_col: venda_unidades
+save_interim: true
+debug: true
+

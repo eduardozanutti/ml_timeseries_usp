@@ -7,7 +7,7 @@ from hierarchicalforecast.utils import aggregate
 
 
 def read_csv_files(material):
-    path = f"dados/{material}"
+    path = f"data/raw/{material}"
     all_files = os.listdir(path)
     df_list = []
     for file in all_files:
@@ -19,7 +19,7 @@ def read_csv_files(material):
     return combined_df
 
 def read_all_csv_files():
-    base_path = "dados/"
+    base_path = "data/raw/"
     all_materials = os.listdir(base_path)
     data_list = []
     for material in all_materials:
