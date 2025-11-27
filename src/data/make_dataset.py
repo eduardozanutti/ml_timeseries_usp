@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from hierarchicalforecast.utils import aggregate
 import logging
+import numpy as np
 
 # Configura logging básico
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -16,62 +17,41 @@ class DatasetCreator:
         self.config = config
         self.data_path = self.config.get('data', {}).get('raw_path', 'data/raw/')
         self.output_path = self.config.get('data', {}).get('interim_path', 'data/interim/')
-        self.keys = self.config.get('keys', [])
-        self.exclude_list_by_materials = self.config.get('exclude_materials', [])
         self.min_time_series_length = self.config.get('min_time_series_length', 24)
         self.dtypes_dict = self.config.get('dtypes', {})  # ex: {'mes': 'datetime', 'marca': 'str'}
         self.hierarchical_spec = self.config.get('hierarchical_spec', [])  # ex: [['total'], ['total/marca'], ...]
-        self.hierarchical = self.config.get('hierarchical', False)  # Flag do config
+        self.hierarchy = self.hierarchical_spec[-1] if self.hierarchical_spec else []
         self.columns_selected = self.config.get('columns_selected', None)
         self.ds_col = self.config.get('ds_col', 'mes')  # Coluna de data
         self.y_col = self.config.get('y_col', 'venda_unidades')  # Coluna alvo
-        self.save = self.config.get('save_interim',None)
-        self.debug = self.config.get('debug',False)
+        self.debug = self.config.get('debug', False)
 
-    def read_csv_files(self, material_path):
+    def read_csv_files(self, path):
         """
         Lê CSVs de uma pasta de material.
         """
-        if self.debug:
-            print(f"DEBUG: Iniciando leitura de arquivos em {material_path}")
-            
-        try:
-            all_files = [f for f in os.listdir(material_path) if f.endswith('.csv')]
-            df_list = [pd.read_csv(os.path.join(material_path, file)) for file in all_files]
-            combined_df = pd.concat(df_list, ignore_index=True)
-            combined_df.sort_index(inplace=True)
-            logging.info(f"Lidos {len(df_list)} arquivos para material em {material_path}")
-            if self.debug:
-                print(f"DEBUG: Lidos {len(all_files)} arquivos. Shape do DF combinado: {combined_df.shape}")
-            return combined_df
-        except Exception as e:
-            logging.error(f"Erro ao ler arquivos em {material_path}: {e}")
-            return pd.DataFrame()
+        all_files = os.listdir(path)
+        df_list = []
+        for file in all_files:
+            if file.endswith('.csv'):
+                df = pd.read_csv(os.path.join(path, file),dtype=str)####
+                df_list.append(df)
+        combined_df = pd.concat(df_list)
+        combined_df.sort_index(inplace=True)
+        return combined_df
 
     def read_all_csv_files(self):
-        """
-        Lê todos os materiais (pastas) em data_path.
-        """
-        if self.debug:
-            print(f"DEBUG: Iniciando leitura de todos os materiais em {self.data_path}")
-
-        all_materials = [d for d in os.listdir(self.data_path) if os.path.isdir(os.path.join(self.data_path, d))]
+        all_managements = os.listdir(self.data_path)
         data_list = []
-        for material in all_materials:
-            material_path = os.path.join(self.data_path, material)
-            df_material = self.read_csv_files(material_path)
-            if not df_material.empty:
-                data_list.append(df_material)
-        if data_list:
-            combined = pd.concat(data_list, ignore_index=True)
-            if self.debug:
-                print(f"DEBUG: Todos materiais lidos. Shape total: {combined.shape}")
-            return combined
-        else:
-            logging.warning("Nenhum dado lido.")
-            if self.debug:
-                print("DEBUG: Nenhum dado lido.")
-            return pd.DataFrame()
+        for management in all_managements:
+            management_path = os.path.join(self.data_path,management)
+            all_materials = os.listdir(management_path)
+            for material in all_materials:
+                material_path = os.path.join(management_path, material)
+                if os.path.isdir(material_path):
+                    data_list.append(self.read_csv_files(material_path))
+                    df = pd.concat(data_list)
+        return df
 
     def correcting_dtypes(self, df):
         """
@@ -88,7 +68,9 @@ class DatasetCreator:
                     elif dtype == 'str':
                         df[col] = df[col].astype(str)
                     elif dtype == 'int':
-                        df[col] = df[col].astype(int)
+                        df[col] = pd.to_numeric(df[col], errors='coerce').astype(dtype)
+                    elif dtype == 'float':
+                        df[col] = pd.to_numeric(df[col], errors='coerce').astype(dtype)
                     # Adicione mais tipos se necessário
                 except Exception as e:
                     logging.error(f"Erro ao converter {col} para {dtype}: {e}")
@@ -113,92 +95,156 @@ class DatasetCreator:
             print("DEBUG: Remoção de negativos concluída.")
         return df
 
-    def remove_materials_no_sales(self, df):
-        """
-        Remove materiais da lista de exclusão.
-        """
+    def ajustes_preco_features(self,df):
         if self.debug:
-            print(f"DEBUG: Iniciando remoção de materiais excluídos: {self.exclude_list_by_materials}")
-        if self.exclude_list_by_materials:
-            before_shape = df.shape
-            df = df[~df['material'].isin(self.exclude_list_by_materials)]
-            if self.debug:
-                print(f"DEBUG: Shape antes: {before_shape}, após: {df.shape}")
-        else:
-            if self.debug:
-                print("DEBUG: Nenhuma lista de exclusão fornecida.")
+            print("DEBUG: Iniciando ajustes de preço para a criação de features.")
+    
+        df['preco_unitario'] = df['venda_valor_total']/df['venda_unidades']
+
+        # Primeiro preenche com qualquer coisa que tenha (mesmo que 50% vazio)
+        df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_atual'])
+        df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_original'])
+
+        # Usa mediana POR SKU + LOJA
+        mediana_sku_loja = df.groupby(['sku', 'loja'])['preco_unitario'].transform('median')
+
+        df['preco_unitario'] = df['preco_unitario'].fillna(mediana_sku_loja)
+
+        # Se ainda faltar media SKU (poucos casos)
+        mediana_sku = df.groupby('sku')['preco_unitario'].transform('median')
+        df['preco_unitario'] = df['preco_unitario'].fillna(mediana_sku)
+
+        # Último recurso: mediana geral
+        df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_unitario'].median())
+
+        df['desconto_percentual'] = np.where(
+        df['preco_original'].notna() & (df['preco_original'] > 0),
+        (df['preco_original'] - df['preco_unitario']) / df['preco_original'],
+        0   # onde não tinha preco_original → assume zero desconto
+        )
+
+        df['desconto_percentual'] = np.where(df['desconto_percentual']<0,0,df['desconto_percentual'])
+
+        df['desconto_absoluto'] = df['preco_original'] - df['preco_unitario']
+        df['desconto_absoluto'] = df['desconto_absoluto'].fillna(0)
+        #garantir que não tenha desconto negativo
+        df['desconto_absoluto'] = np.where(df['desconto_absoluto']<0,0,df['desconto_absoluto'])
+
+        # 2. Features de desconto + dummies (o que realmente importa)
+        df['tem_preco_original'] = df['preco_original'].notna().astype(int)
+
+        df.drop(columns=['preco_atual','preco_original','diff_preco','etiqueta'],inplace=True)
+        if self.debug:
+            print("DEBUG: Ajustes de preço concluídos.")
         return df
 
-    def remove_time_series_min_length(self, df):
+    def ajustar_decotes(self,df):
+        if self.debug:
+            print("DEBUG: Iniciando ajuste de decotes.")
+        df['decote'] = df['decote'].replace({
+        'decote u': 'u',
+        'decote v': 'v'
+        })
+        if self.debug:
+            print("DEBUG: Ajuste de decotes concluído.")
+    
+        return df
+    
+    def create_total_hierarchy_level(self, df):
         """
-        Remove séries temporais com menos que min_time_series_length observações.
+        Cria nível 'total' na hierarquia.
         """
         if self.debug:
-            print(f"DEBUG: Iniciando filtro de séries com mínimo {self.min_time_series_length} observações.")
-        counts = df.groupby(self.keys).size().reset_index(name='n_obs')
+            print("DEBUG: Criando nível 'total' na hierarquia.")
+        df['total'] = 'total'
         if self.debug:
-            print(f"DEBUG: Séries totais: {len(counts)}. Séries curtas: {(counts['n_obs'] < self.min_time_series_length).sum()}")
-        valid = counts[counts['n_obs'] >= self.min_time_series_length][self.keys]
-        df = df.merge(valid, on=self.keys, how='inner')
-        if self.debug:
-            print(f"DEBUG: Filtro concluído. Shape final: {df.shape}")
+            print("DEBUG: Nível 'total' criado.")
         return df
 
-    def hierarchical_aggregation(self, df):
+    def remove_short_series_hierarchical(
+        self,
+        df: pd.DataFrame,
+        min_length: int = 42
+    ) -> pd.DataFrame:
         """
-        Realiza agregação hierárquica se ativado.
+        Remove séries temporais curtas de forma HIERÁRQUICA (bottom-up).
+        
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Dados com colunas de hierarquia + coluna de tempo.
+        hierarchy : list[str]
+            Lista ORDENADA do nível mais baixo até o mais alto.
+            Ex: ['sku', 'material', 'produto', 'loja', 'clima_loja', 'regiao_loja', 'centro_distribuicao']
+        time_col : str
+            Nome da coluna de tempo (não usada no groupby, só pra clareza).
+        min_length : int
+            Número mínimo de observações por série.
+            
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame filtrado (apenas séries válidas em todos os níveis).
         """
         if self.debug:
-            print("DEBUG: Iniciando agregação hierárquica.")
+            print("DEBUG: Iniciando remoção hierárquica de séries curtas.")
 
-        for col in self.hierarchical_spec:
-            hier_col = col[-1]
-            if hier_col != 'total':
-                self.columns_selected.append(hier_col)
-        df_h = df[self.columns_selected].copy()
-        df_h = df_h.dropna() ####
+        df = df.copy()  # não modifica o original
+        
+        # Percorre do nível mais baixo até o mais alto (bottom-up)
+        for i in range(len(self.hierarchy) - 1, -1, -1):  # ex: de 6 até 0
+            current_level_cols = self.hierarchy[:i + 1]   # ['sku'], ['sku','material'], ..., todas
+            
+            print(f"Filtrando nível: {current_level_cols} (>= {min_length} obs)")
+            
+            # Conta observações por combinação atual
+            counts = df.groupby(current_level_cols).size()
+            
+            # Mantém apenas as combinações com pelo menos min_length observações
+            valid_combinations = counts[counts >= min_length].index
+            
+            # Filtra o DataFrame (muito mais rápido que merge!)
+            df = df.set_index(current_level_cols).loc[valid_combinations].reset_index()
+            
+            print(f"   → {len(counts):,} combinações → {len(valid_combinations):,} mantidas "
+                f"({100*len(valid_combinations)/max(len(counts),1):.1f}%)")
         if self.debug:
-            print(f"DEBUG: Após dropna, shape: {df_h.shape}")
-        df_h = df_h.rename(columns={self.ds_col: 'ds', self.y_col: 'y'}) ###
-        df_h['total'] = 'total' ####
-        df_h['ds'] = pd.to_datetime(df_h['ds'])
-        df_h = df_h.sort_values('ds')
+            print(f"\nLimpeza concluída! Linhas finais: {len(df):,}")
+        return df
 
-        try:
-            Y_df, S_df, tags = aggregate(df=df_h, spec=self.hierarchical_spec)
-            logging.info("Agregação hierárquica concluída.")
-            if self.debug:
-                print(f"DEBUG: Shape Y_df: {Y_df.shape}, S_df: {S_df.shape}")
-            print("Níveis criados:")
-            for k, v in tags.items():
-                print(f"{k}: {len(v)} séries")
-            return Y_df, S_df, tags
-        except Exception as e:
-            logging.error(f"Erro na agregação hierárquica: {e}")
-            return None, None, None
-
-    def save_intermediary(self, df_or_tuple, path='data/interim/dataset.parquet'):
+    def save_intermediary(self, df,filename='dataset.parquet'):
         """
         Salva o dataset intermediário em Parquet.
         """
+        save_path = os.path.join(self.output_path, filename)
+
         if self.debug:
-            print(f"DEBUG: Iniciando salvamento em {self.output_path}")
+            print(f"DEBUG: Iniciando salvamento em {save_path}")
 
         try:
-            full_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), path)
-            if isinstance(df_or_tuple, tuple):  # Modo hierárquico
-                Y_df, S_df, _ = df_or_tuple
-                Y_df.to_parquet(full_path.replace('.parquet', '_Y.parquet'), compression='snappy')
-                S_df.to_parquet(full_path.replace('.parquet', '_S.parquet'), compression='snappy')
-                if self.debug:
-                    print("DEBUG: Salvos Y_df e S_df em Parquet.")
-            else:  # Modo flat
-                df_or_tuple.to_parquet(full_path, compression='snappy')
-                if self.debug:
-                    print("DEBUG: Salvo DF flat em Parquet.")
-            logging.info(f"Dataset salvo em {full_path}")
+            df.to_parquet(save_path, compression='snappy')
+            if self.debug:
+                print("DEBUG: Dataset Salvo.")
         except Exception as e:
             logging.error(f"Erro ao salvar: {e}")
+
+    def load_intermediary(self,filename='dataset.parquet'):
+        """
+        Carrega o dataset intermediário de Parquet.
+        """
+        if self.debug:
+            print(f"DEBUG: Iniciando carregamento de {self.output_path}")
+
+        load_path = os.path.join(self.output_path, filename)
+        
+        try:
+            df = pd.read_parquet(load_path)
+            if self.debug:
+                print("DEBUG: Dataset Carregado.")
+            return df
+        except Exception as e:
+            logging.error(f"Erro ao carregar: {e}")
+            return None
 
     def run(self):
         """
@@ -206,27 +252,20 @@ class DatasetCreator:
         Retorna DF flat ou (Y_df, S_df, tags) se hierárquico.
         """
         if self.debug:
-            print("DEBUG: Iniciando pipeline completo (run).")
+            print("DEBUG: Iniciando pipeline de preparação de dados.")
         df = self.read_all_csv_files()
-        if df.empty:
-            return None
-
         df = self.correcting_dtypes(df)
         df = self.stocks_removing_negatives(df)
-        df = self.remove_materials_no_sales(df)
-        df = self.remove_time_series_min_length(df)
-
-        if self.hierarchical:
-            result = self.hierarchical_aggregation(df)
-        else:
-            result = df,None,None
-
-        if self.save:
-            self.save_intermediary(result)
+        df = self.ajustes_preco_features(df)
+        df = self.ajustar_decotes(df)
+        df = self.create_total_hierarchy_level(df)
+        df = self.remove_short_series_hierarchical(df,min_length = self.min_time_series_length)
+        self.save_intermediary(df,filename='dataset.parquet')
+        df = self.load_intermediary(filename='dataset.parquet')
 
         if self.debug:
-            print("DEBUG: Pipeline concluído.")
-        return result
+            print(f"DEBUG: Shape final após limpeza: {df.shape}")
+        return df
 
 if __name__ == "__main__":
     creator = DatasetCreator()

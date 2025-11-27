@@ -6,8 +6,7 @@ import seaborn as sns
 from hierarchicalforecast.utils import aggregate
 
 
-def read_csv_files(material):
-    path = f"data/raw/{material}"
+def read_csv_files(path):
     all_files = os.listdir(path)
     df_list = []
     for file in all_files:
@@ -18,15 +17,18 @@ def read_csv_files(material):
     combined_df.sort_index(inplace=True)
     return combined_df
 
-def read_all_csv_files():
-    base_path = "data/raw/"
-    all_materials = os.listdir(base_path)
+def read_all_csv_files(base_path):
+    all_managements = os.listdir(base_path)
     data_list = []
-    for material in all_materials:
-        material_path = os.path.join(base_path, material)
-        if os.path.isdir(material_path):
-            data_list.append(read_csv_files(material))
-    df = pd.concat(data_list)
+    for management in all_managements:
+        management_path = os.path.join(base_path,management)
+        all_materials = os.listdir(management_path)
+        #print(all_materials)
+        for material in all_materials:
+            material_path = os.path.join(management_path, material)
+            if os.path.isdir(material_path):
+                data_list.append(read_csv_files(material,material_path))
+                df = pd.concat(data_list)
     return df
 
 def correcting_dtypes(df):
@@ -36,6 +38,11 @@ def correcting_dtypes(df):
     df['clima_loja'] = df['clima_loja'].astype(str)
     df['porte_loja'] = df['porte_loja'].astype(str)
     df['perfil_loja'] = df['perfil_loja'].astype(str)
+    df['estoque_unidades_inicio'] = df['estoque_unidades_inicio'].astype(int)
+    df['estoque_unidades_fim'] = df['estoque_unidades_fim'].astype(int)
+    df['estoque_unidades'] = df['estoque_unidades'].astype(int)
+    df['estoque_unidades_mediana'] = df['estoque_unidades_mediana'].astype(int)
+    df['venda_unidades'] = df['venda_unidades'].astype(int)
     return df
 
 def stocks_removing_negatives(df):
@@ -746,3 +753,151 @@ def remove_time_series_min_length(y, min_length):
     valid = counts[counts['n_obs'] >= min_length][group_cols]
     # filtra o dataframe original pelas séries válidas
     return y.merge(valid, on=group_cols, how='inner')
+
+def droping_and_replace_prices(df):
+    df = df.drop(['preco_medio_unitario','preco_unitario_min','preco_unitario_max','variabilidade_preco_unitario'],axis=1)
+    df['preco_unitario'] = df['venda_valor_total']/df['venda_unidades']
+    return df
+
+def fillna_hierarchical(df, target_col, hierarchy_levels, agg_func='median'):
+    """
+    Preenche NaN de forma hierárquica, do mais específico ao mais geral.
+    
+    Parâmetros:
+    - df: DataFrame
+    - target_col: coluna com NaN (ex: 'preco_unitario')
+    - hierarchy_levels: lista de listas com níveis (do mais específico ao geral)
+    - agg_func: 'median', 'mean', 'max', etc.
+    """
+    df = df.copy()
+    col = df[target_col]
+    
+    for level in hierarchy_levels:
+        print(f"Preenchendo com: {level} → {agg_func}")
+        filled = df.groupby(level)[target_col].transform(agg_func)
+        col = col.fillna(filled)
+    
+    # Último fallback: mediana global
+    if col.isnull().any():
+        global_value = df[target_col].agg(agg_func)
+        print(f"Preenchendo global com {agg_func}: {global_value}")
+        col = col.fillna(global_value)
+    
+    df[target_col] = col
+    return df
+
+def ajustar_decotes(df):
+    df['decote'] = df['decote'].replace({
+    'decote u': 'u',
+    'decote v': 'v'
+})
+    return df
+
+
+def remover_dados_duplicados_estoque(df):
+    df_estoque = df.groupby(['sku','loja','mes']).agg({'estoque_unidades_inicio':'sum',
+                                    'estoque_unidades_fim':'sum',
+                                    'estoque_unidades':'sum',
+                                    'estoque_unidades_mediana':'sum',
+                                    'prop_dias_com_estoque':'sum'}).reset_index()
+
+    df_sem_estoque = df.drop(['estoque_unidades_inicio',
+         'estoque_unidades_fim',
+         'estoque_unidades',
+         'estoque_unidades_mediana',
+         'prop_dias_com_estoque'],axis=1
+         ).fillna('missing').groupby(['sku','loja','mes']
+         ).max()
+         
+    df = df_sem_estoque.merge(df_estoque,on=['sku','loja','mes'],how='inner')
+    return df
+
+
+def ajustes_preco_features(df):
+    
+    df['preco_unitario'] = df['venda_valor_total']/df['venda_unidades']
+
+    # Primeiro preenche com qualquer coisa que tenha (mesmo que 50% vazio)
+    df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_atual'])
+    df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_original'])
+
+    # Usa mediana POR SKU + LOJA
+    mediana_sku_loja = df.groupby(['sku', 'loja'])['preco_unitario'].transform('median')
+
+    df['preco_unitario'] = df['preco_unitario'].fillna(mediana_sku_loja)
+
+    # Se ainda faltar media SKU (poucos casos)
+    mediana_sku = df.groupby('sku')['preco_unitario'].transform('median')
+    df['preco_unitario'] = df['preco_unitario'].fillna(mediana_sku)
+
+    # Último recurso: mediana geral
+    df['preco_unitario'] = df['preco_unitario'].fillna(df['preco_unitario'].median())
+
+    df['desconto_percentual'] = np.where(
+    df['preco_original'].notna() & (df['preco_original'] > 0),
+    (df['preco_original'] - df['preco_unitario']) / df['preco_original'],
+    0   # onde não tinha preco_original → assume zero desconto
+    )
+
+    df['desconto_percentual'] = np.where(df['desconto_percentual']<0,0,df['desconto_percentual'])
+
+    df['desconto_absoluto'] = df['preco_original'] - df['preco_unitario']
+    df['desconto_absoluto'] = df['desconto_absoluto'].fillna(0)
+    #garantir que não tenha desconto negativo
+    df['desconto_absoluto'] = np.where(df['desconto_absoluto']<0,0,df['desconto_absoluto'])
+
+    # 2. Features de desconto + dummies (o que realmente importa)
+    df['tem_preco_original'] = df['preco_original'].notna().astype(int)
+
+    df.drop(columns=['preco_atual','preco_original','diff_preco','etiqueta'],inplace=True)
+    return df
+
+
+def remove_short_series_hierarchical(
+    df: pd.DataFrame,
+    hierarchy: list[str],
+    time_col: str = 'mes',
+    min_length: int = 24
+) -> pd.DataFrame:
+    """
+    Remove séries temporais curtas de forma HIERÁRQUICA (bottom-up).
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dados com colunas de hierarquia + coluna de tempo.
+    hierarchy : list[str]
+        Lista ORDENADA do nível mais baixo até o mais alto.
+        Ex: ['sku', 'material', 'produto', 'loja', 'clima_loja', 'regiao_loja', 'centro_distribuicao']
+    time_col : str
+        Nome da coluna de tempo (não usada no groupby, só pra clareza).
+    min_length : int
+        Número mínimo de observações por série.
+        
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame filtrado (apenas séries válidas em todos os níveis).
+    """
+    df = df.copy()  # não modifica o original
+    
+    # Percorre do nível mais baixo até o mais alto (bottom-up)
+    for i in range(len(hierarchy) - 1, -1, -1):  # ex: de 6 até 0
+        current_level_cols = hierarchy[:i + 1]   # ['sku'], ['sku','material'], ..., todas
+        
+        print(f"Filtrando nível: {current_level_cols} (>= {min_length} obs)")
+        
+        # Conta observações por combinação atual
+        counts = df.groupby(current_level_cols).size()
+        
+        # Mantém apenas as combinações com pelo menos min_length observações
+        valid_combinations = counts[counts >= min_length].index
+        
+        # Filtra o DataFrame (muito mais rápido que merge!)
+        df = df.set_index(current_level_cols).loc[valid_combinations].reset_index()
+        
+        print(f"   → {len(counts):,} combinações → {len(valid_combinations):,} mantidas "
+              f"({100*len(valid_combinations)/max(len(counts),1):.1f}%)")
+    
+    print(f"\nLimpeza concluída! Linhas finais: {len(df):,}")
+    return df

@@ -1,27 +1,269 @@
+# === EXTRAS ===
+debug: true
+remove_outliers: false
+
+# === CONFIGURAÇÃO DOS DADOS ===
+ds_col: mes
+y_col: venda_unidades
+time_col: mes           # ← importante pro MLForecast
+target_col: venda_unidades
+id_col: sku             # ← seu unique_id (ajuste se for outro)
+
+outlier:
+  remove: false
+  iqr_factor: 3.0
+  season_length: 12
+
 data:
   raw_path: data/raw/
-keys: ['material', 'loja']
-exclude_materials: [123, 456]  # Lista de materiais a excluir
-min_time_series_length: 24
-dtypes:
-  mes: datetime
-  marca: str
-  idade_loja: int
-  # etc.
-hierarchical: false  # Mude para true para ativar
+  interim_path: data/interim/
+
+min_time_series_length: 42
+columns_selected: ['mes', 'venda_unidades']
+
+# === HIERARQUIA ===
 hierarchical_spec:
   - ['total']
   - ['total','centro_distribuicao']
-  #- ['total','centro_distribuicao','regiao_loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material','sku']
+  - ['total','centro_distribuicao','regiao_loja']
+  - ['total','centro_distribuicao','regiao_loja','clima_loja']
+  - ['total','centro_distribuicao','regiao_loja','clima_loja','loja']
+  - ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto']
+  - ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material']
+  - ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material','sku']
 
-columns_selected: ['mes', 'venda_unidades']
-ds_col: mes
-y_col: venda_unidades
-save_interim: true
-debug: true
+# === FEATURES ===
+features:
+  categorical_features:
+    - cor
+    - tamanho
+    - padronagem
+    - construcao
+    - marca
+    - decote
+    - detalhe
 
+  numerical_features:
+    - estoque_unidades_inicio
+    - estoque_unidades_fim
+    - estoque_unidades
+    - estoque_unidades_mediana
+    - prop_dias_com_estoque
+    - preco_unitario
+    - desconto_percentual
+    - desconto_absoluto
+    - tem_preco_original
+    - prop_dias_com_venda
+    - total_observacoes_vendas
+    - pedidos_m1
+    - pedidos_m2
+    - pedidos_m3
+    - pedidos_m4
+    - pedidos_m5
+    - pedidos_m6
+    - pedidos_m7  
+
+  external_features:
+    - weather_temperature
+    - weather_preassure
+    - weather_precipitation
+
+  holiday_features:
+    natal:
+      dates: [2022-12-01, 2023-12-01, 2024-12-01, 2025-12-01]
+      window_before: 3
+      window_after: 1
+    black_friday:
+      dates: [2022-11-01, 2023-11-01, 2024-11-01, 2025-11-01]
+      window_before: 2
+      window_after: 1
+    dia_maes:
+      dates: [2022-05-01, 2023-05-01, 2024-05-01, 2025-05-01]
+      window_before: 1
+      window_after: 0
+    carnaval:
+      dates: [2022-02-01, 2023-02-01, 2024-02-01, 2025-02-01]
+      window_before: 1
+      window_after: 1
+
+# === MODELOS (MULTI-MODEL FULL FLEX) ===
+models:
+  LightGBM:
+    enabled: true
+    type: mlforecast
+    regressor: LGBMRegressor
+    fixed_params:
+      objective: poisson
+      boosting_type: gbdt
+      metric: mape
+      bagging_freq: 1
+      force_col_wise: true
+      verbose: -1
+      n_jobs: -1
+      seed: 42
+      deterministic: true
+
+  XGBoost:
+    enabled: true
+    type: mlforecast
+    regressor: XGBRegressor
+    fixed_params:
+      objective: reg:squarederror
+      eval_metric: mape
+      n_jobs: -1
+      seed: 42
+      tree_method: hist
+      enable_categorical: true
+
+  CatBoost:
+    enabled: true
+    type: mlforecast
+    regressor: CatBoostRegressor
+    fixed_params:
+      loss_function: Poisson
+      eval_metric: MAPE
+      thread_count: -1
+      verbose: false
+      random_seed: 42
+      cat_features: auto
+      allow_writing_files: false
+
+  StatsForecast:
+    enabled: true
+    type: statsforecast
+    models:
+      AutoARIMA: {season_length: 12, approximation: true}
+      AutoETS: {season_length: 12, model: ZZZ}
+      AutoTheta: {season_length: 12, decomposition_type: multiplicative}
+      SeasonalNaive: {season_length: 12}
+      HistoricAverage: {}
+
+# === ESPAÇO DE BUSCA (comum) ===
+parameter_space:
+  learning_rate: {low: 0.01, high: 0.3, log: true}
+  n_estimators: {low: 500, high: 5000, log: true}
+  max_depth: {low: 3, high: 15}
+  min_child_samples: {low: 5, high: 200, log: true}      # LGBM
+  min_child_weight: {low: 1, high: 100, log: true}       # XGB/Cat
+  subsample: {low: 0.6, high: 1.0}
+  colsample_bytree: {low: 0.6, high: 1.0}
+  reg_alpha: {low: 1e-8, high: 10.0, log: true}
+  reg_lambda: {low: 1e-8, high: 10.0, log: true}
+
+# === MODELAGEM MLFORECAST ===
+modeling:
+  mlforecast:
+    freq: MS
+    h: 6
+    n_windows: 6
+    step_size: 1
+    time_col: mes
+    target_col: venda_unidades
+    id_col: sku
+
+    init_params:
+      lags: [1, 2, 3, 4, 5, 6, 12]
+      lag_transforms:
+        1: [ExpandingMean]
+        2:
+          - RollingMean: {window_size: 3}
+          - RollingMean: {window_size: 6}
+        12: [RollingMean: {window_size: 3}]
+      target_transforms: [LocalBoxCox]
+      date_features: [month, quarter, is_month_start, is_month_end]
+
+    fit_params:
+      static_features:
+        - sku
+        - loja
+        - produto
+        - material
+        - cor
+        - tamanho
+        - marca
+        - clima_loja
+
+    backtest:
+      enabled: true
+      n_months_test: 6
+      strategy: last_n_months
+
+    validation:
+      metric: smape
+      n_trials: 80
+      timeout: 14400
+
+# === ENSEMBLE ===
+ensemble:
+  enabled: true
+  strategy: weighted_average
+  method: backtest_performance
+  min_weight: 0.05
+  fallback: CatBoost
+
+# === RECONCILIAÇÃO HIERÁRQUICA ===
+reconciliation:
+  enabled: true
+  method: MinT
+  min_trace_method: shrink
+
+# === OPTUNA ===
+optuna:
+  n_trials: 80
+  timeout: 14400
+  sampler:
+    type: TPESampler
+    seed: 42
+  pruner:
+    type: MedianPruner
+    n_startup_trials: 40
+
+# === DTYPES ===
+dtypes:
+  material: object
+  sku: object
+  produto: object
+  cor: object
+  tamanho: object
+  construcao: object
+  padronagem: object
+  marca: object
+  decote: object
+  detalhe: object
+  loja: object
+  centro_distribuicao: object
+  idade_loja: int
+  uf_loja: object
+  cidade_loja: object
+  regiao_loja: object
+  bairro_loja: object
+  clima_loja: object
+  perfil_loja: object
+  porte_loja: object
+  estoque_unidades_inicio: int
+  estoque_unidades_fim: int
+  estoque_unidades: int
+  estoque_unidades_mediana: float
+  prop_dias_com_estoque: float
+  venda_unidades: int
+  venda_valor_total: float
+  preco_atual: float
+  preco_original: float
+  diff_preco: float
+  etiqueta: object
+  mes: datetime
+  prop_dias_com_venda: float
+  total_observacoes_vendas: int
+  pedidos: int
+  pedidos_m1: int
+  pedidos_m2: int
+  pedidos_m3: int
+  pedidos_m4: int
+  pedidos_m5: int
+  pedidos_m6: int
+  pedidos_m7: int
+  pedidos_m8: int
+  pedidos_m9: int
+  pedidos_m10: int
+  pedidos_m11: int
+  pedidos_m12: int
