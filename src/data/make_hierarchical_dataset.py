@@ -13,14 +13,15 @@ class DatasetHierarchicalAggregator:
     """
     Classe para tornar os dados hierarquicos.
     """
-    def __init__(self, config,df):
+    def __init__(self, config,df, dataset_type='global'):
         self.df = df
+        self.dataset_type = dataset_type
         self.columns = self.df.columns
         self.categorical_features = [col for col in self.columns if col[:4] == 'cat_']
         self.numerical_features = [col for col in self.columns if col[:4] == 'num_']
         self.holiday_features = [col for col in self.columns if col[:4] == 'dat_']
         self.config = config
-        self.output_path = self.config.get('data', {}).get('interim_path', 'data/interim/')
+        self.path = self.config.get('data', {}).get('processed_path', 'data/processed/')
         self.hierarchical_spec = self.config.get('hierarchical_spec', [])  # ex: [['total'], ['total/marca'], ...]
         self.hierarchy = self.hierarchical_spec[-1] if self.hierarchical_spec else []
         self.columns_selected = self.config.get('columns_selected', None)
@@ -63,15 +64,16 @@ class DatasetHierarchicalAggregator:
             logging.error(f"Erro na agregação hierárquica: {e}")
             return None, None, None
 
-    def save_intermediary(self, df,filename='dataset.parquet'):
+    def save_processed(self, df,filename='dataset.parquet'):
         """
-        Salva o dataset intermediário em Parquet.
+        Salva o dataset final em Parquet.
         """
         
         if self.debug:
-            print(f"DEBUG: Iniciando salvamento em {self.output_path}")
+            print(f"DEBUG: Iniciando salvamento em {self.path}")
 
-        save_path = os.path.join(self.output_path, filename)
+        dataset_output_path = self.path+self.dataset_type
+        save_path = os.path.join(dataset_output_path, filename)
 
         try:
             df.to_parquet(save_path, compression='snappy')
@@ -87,7 +89,8 @@ class DatasetHierarchicalAggregator:
         if self.debug:
             print(f"DEBUG: Salvando JSON em {filename}")
 
-        save_path = os.path.join(self.output_path, filename)
+        dataset_output_path = self.path+self.dataset_type
+        save_path = os.path.join(dataset_output_path, filename)
 
         try:
            # Salva EXATAMENTE como era (arrays, dtypes, tudo)
@@ -104,8 +107,9 @@ class DatasetHierarchicalAggregator:
         """
         if self.debug:
             print(f"DEBUG: Carregando tags de {filename}")
-
-        load_path = os.path.join(self.output_path, filename)
+        
+        dataset_load_path = self.path+self.dataset_type
+        load_path = os.path.join(dataset_load_path, filename)
 
         try:
             tags = joblib.load(load_path)
@@ -119,9 +123,11 @@ class DatasetHierarchicalAggregator:
         Carrega o dataset intermediário de Parquet.
         """
         if self.debug:
-            print(f"DEBUG: Iniciando carregamento de {self.output_path}")
+            print(f"DEBUG: Iniciando carregamento de {self.path}")
 
-        load_path = os.path.join(self.output_path, filename)
+        dataset_load_path = self.path+self.dataset_type
+        load_path = os.path.join(dataset_load_path, filename)
+        
         
         try:
             df = pd.read_parquet(load_path)
@@ -140,16 +146,18 @@ class DatasetHierarchicalAggregator:
         if self.debug:
             print("DEBUG: Iniciando pipeline de preparação de dados.")
         Y_df, S_df, tags = self.hierarchical_aggregation(self.df)
-        self.save_intermediary(Y_df,filename='hierarchical_dataset.parquet')
-        self.save_intermediary(S_df,filename='hierarchical_structure.parquet')
-        self.save_tags(tags, filename='hierarchical_tags.joblib')
-        Y_df = self.load_intermediary(filename='hierarchical_dataset.parquet')
-        S_df = self.load_intermediary(filename='hierarchical_structure.parquet')
-        tags = self.load_tags(filename='hierarchical_tags.joblib')
+        self.save_processed(Y_df,filename='dataset.parquet')
+        if self.dataset_type != 'local':
+            self.save_processed(S_df,filename='structure.parquet')
+            self.save_tags(tags, filename='tags.joblib')
+            S_df = self.load_intermediary(filename='structure.parquet')
+            tags = self.load_tags(filename='tags.joblib')
+        Y_df = self.load_intermediary(filename='dataset.parquet')
+        
         if self.debug:
             print(f"DEBUG: Pipeline concluído.")
         return Y_df, S_df, tags
 
 if __name__ == "__main__":
-    aggregator = self.DatasetHierarchicalAggregator()
+    aggregator = DatasetHierarchicalAggregator()
     result = aggregator.run()
