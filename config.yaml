@@ -2,6 +2,7 @@
 debug: false
 remove_outliers: false
 exogen_features: false
+cache: true
 
 # === CONFIGURAÇÃO DOS DADOS ===
 ds_col: mes
@@ -15,10 +16,16 @@ outlier:
   iqr_factor: 3.0
   season_length: 12
 
-data:
-  raw_path: data/raw/
-  interim_path: data/interim/
-  processed_path: data/processed/
+paths:
+  data:
+    raw_path: data/raw/
+    interim_path: data/interim/
+    processed_path: data/processed/
+  models:
+    candidates_model_path: models/candidates
+    champion_model_path: models/champion
+  plots:
+    plots_path: plots/
 
 min_time_series_length: 42
 columns_selected: ['mes', 'venda_unidades']
@@ -189,17 +196,33 @@ parameter_space:
     reg_alpha: {low: 1e-8, high: 10.0, log: true}
     reg_lambda: {low: 1e-8, high: 10.0, log: true}
 
-# === PRESETS DE FEATURES (TUDO AQUI — unificado e perfeito) ===
+# === PRESETS DE FEATURES ===
 modeling:
-  mlforecast:
-    freq: MS
+  training_metric:
+    rmsse
+  validation_metric:
+    wrsse
+  compare_metrics:
+    - rmse
+    - rmsse 
+    - mase
+    - smape
+  cv_config:
     h: 6
     n_windows: 6
     step_size: 1
+  statsforecast:
+    freq: MS
     time_col: ds
     target_col: y
     id_col: unique_id
-
+    n_jobs: -1
+  mlforecast:
+    freq: MS
+    time_col: ds
+    target_col: y
+    id_col: unique_id
+    n_jobs: -1
     # === TUNING ATIVO ===
     tuning:
       search_lag_preset: true
@@ -268,7 +291,7 @@ modeling:
       n_months_test: 6
       
     validation:
-      metric: smape
+      metric: rmse
       n_trials: 100
       timeout: 14400
 
@@ -283,8 +306,8 @@ ensemble:
 # === RECONCILIAÇÃO HIERÁRQUICA ===
 reconciliation:
   enabled: true
-  method: MinT
-  min_trace_method: shrink
+  methods: [BottomUp,TopDown,MiddleOut,MinTrace]
+  min_trace_methods: ['wls_var','wls_struct','mint_shrink']
 
 # === OPTUNA ===
 optuna:

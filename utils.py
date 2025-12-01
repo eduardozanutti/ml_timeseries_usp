@@ -5,6 +5,13 @@ import numpy as np
 import seaborn as sns
 from hierarchicalforecast.utils import aggregate
 
+def make_folder_with_no_path(caminho):
+    """
+    Verifica se o diretório existe. Se não existir, cria ele (e todas as subpastas necessárias).
+    """
+    if not os.path.exists(caminho):
+        os.makedirs(caminho)
+        return
 
 def read_csv_files(path):
     all_files = os.listdir(path)
