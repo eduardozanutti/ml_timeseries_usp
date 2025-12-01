@@ -21,7 +21,7 @@ class DatasetHierarchicalAggregator:
         self.numerical_features = [col for col in self.columns if col[:4] == 'num_']
         self.holiday_features = [col for col in self.columns if col[:4] == 'dat_']
         self.config = config
-        self.path = self.config.get('data', {}).get('processed_path', 'data/processed/')
+        self.path = self.config.get('paths', {}).get('data', {}).get('processed_path', 'data/processed/')
         self.hierarchical_spec = self.config.get('hierarchical_spec', [])  # ex: [['total'], ['total/marca'], ...]
         self.hierarchy = self.hierarchical_spec[-1] if self.hierarchical_spec else []
         self.columns_selected = self.config.get('columns_selected', None)
@@ -29,7 +29,7 @@ class DatasetHierarchicalAggregator:
         self.y_col = self.config.get('y_col', 'venda_unidades')  # Coluna alvo
         self.debug = self.config.get('debug', False)
 
-    def hierarchical_aggregation(self, df):
+    def hierarchical_aggregation(self, df=None):
         """
         Realiza agregação hierárquica se ativado.
         """
@@ -118,14 +118,14 @@ class DatasetHierarchicalAggregator:
             logging.error(f"Erro ao carregar tags: {e}")
             return None
 
-    def load_intermediary(self, filename='dataset.parquet'):
+    def load_processed(self, filename='dataset.parquet'):
         """
         Carrega o dataset intermediário de Parquet.
         """
         if self.debug:
             print(f"DEBUG: Iniciando carregamento de {self.path}")
 
-        dataset_load_path = self.path+self.dataset_type
+        dataset_load_path = self.path + self.dataset_type
         load_path = os.path.join(dataset_load_path, filename)
         
         
@@ -150,9 +150,9 @@ class DatasetHierarchicalAggregator:
         if self.dataset_type != 'local':
             self.save_processed(S_df,filename='structure.parquet')
             self.save_tags(tags, filename='tags.joblib')
-            S_df = self.load_intermediary(filename='structure.parquet')
+            S_df = self.load_processed(filename='structure.parquet')
             tags = self.load_tags(filename='tags.joblib')
-        Y_df = self.load_intermediary(filename='dataset.parquet')
+        Y_df = self.load_processed(filename='dataset.parquet')
         
         if self.debug:
             print(f"DEBUG: Pipeline concluído.")

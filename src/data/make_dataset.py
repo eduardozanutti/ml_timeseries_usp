@@ -15,8 +15,8 @@ class DatasetCreator:
     """
     def __init__(self, config):
         self.config = config
-        self.data_path = self.config.get('data', {}).get('raw_path', 'data/raw/')
-        self.output_path = self.config.get('data', {}).get('interim_path', 'data/interim/')
+        self.data_path = self.config.get('paths', {}).get('data', {}).get('raw_path', 'data/raw/')
+        self.output_path = self.config.get('paths', {}).get('data', {}).get('interim_path', 'data/interim/')
         self.min_time_series_length = self.config.get('min_time_series_length', 24)
         self.dtypes_dict = self.config.get('dtypes', {})  # ex: {'mes': 'datetime', 'marca': 'str'}
         self.hierarchical_spec = self.config.get('hierarchical_spec', [])  # ex: [['total'], ['total/marca'], ...]

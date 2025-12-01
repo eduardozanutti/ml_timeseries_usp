@@ -6,8 +6,7 @@ import pandas as pd
 from mlforecast import MLForecast
 from statsforecast import StatsForecast
 from mlforecast.optimization import mlforecast_objective
-from utilsforecast.losses import rmse, mae, smape, mase, scaled_crps, mqloss,rmsse
-
+from utilsforecast.losses import rmse, mae, smape, mase,rmsse,bias
 # Mapeamento string → objeto real (o coração do sistema)
 from src.utils.presets import build_lag_transforms, build_target_transforms
 from src.utils.optuna_presets import get_sampler_map, get_pruner_map
@@ -15,17 +14,17 @@ from src.utils.model_registry import get_model_class
 import logging
 
 class ModelTuning:
-    def __init__(self, df, config, model_name,fixed_params,param_space,mlforecast_params):
+    def __init__(self, df, config, model_name,fixed_params,param_space,cv_config,mlforecast_params,tuning_metric):
         self.df = df.copy()
         self.model_name = model_name
         self.model = get_model_class(self.model_name)
         self.fixed_params = fixed_params
         self.param_space = param_space
-        self.mlf_freq = mlforecast_params.get('freq',{})
-        self.mlf_n_window = mlforecast_params.get('n_windows',{})
-        self.mlf_step_size = mlforecast_params.get('step_size',{})
+        self.mlf_n_window = cv_config.get('n_windows',{})
+        self.mlf_step_size = cv_config.get('step_size',{})
+        self.mlf_h = cv_config.get('h',{})
         self.mlf_id_col = mlforecast_params.get('id_col',{})
-        self.mlf_h = mlforecast_params.get('h',{})
+        self.mlf_freq = mlforecast_params.get('freq',{})
         self.optuna_direction_cfg = config['optuna']['direction']
         self.optuna_sampler_cfg = get_sampler_map(config['optuna']['sampler'])
         self.optuna_pruner_cfg = get_pruner_map(config['optuna']['pruner'])
@@ -38,6 +37,7 @@ class ModelTuning:
         self.active_data_preset = mlforecast_params['tuning']['active_date_preset']
         self.active_target_preset = mlforecast_params['tuning']['active_target_preset']
         self.active_date_preset = mlforecast_params['tuning']['active_date_preset']
+        self.tuning_metric = tuning_metric
         logging.basicConfig(level=logging.DEBUG)  # No init ou global
 
     def get_mlf_init_params(self):
@@ -101,13 +101,22 @@ class ModelTuning:
             'mlf_fit_params': self.get_mlf_fit_params()
         }
         return space
+     
     
-    @staticmethod
-    def loss(df,train_df=None):
-        loss = smape(df, models=['model'])['model'].mean()
-        return loss
+    def loss(self,cv_df, train_df=None):
+        train_df = self.df
+        seasonality = 12
+        metric_map = {
+            'smape': lambda df: smape(df, models=['model'])['model'].mean(),
+            'mase':  lambda df: mase(df, models=['model'], seasonality=seasonality)['model'].mean(),
+            'rmsse': lambda df: rmsse(df, models=['model'],seasonality=12,train_df=train_df)['model'].mean(),
+            'rmse':  lambda df: rmse(df,models=['model'])['model'].mean()
+        }
+            
+        return metric_map[self.tuning_metric](cv_df)
     
     def create_objetive(self):
+        
         objective = mlforecast_objective(
         df=self.df,
         config_fn=self.config_fn,
@@ -135,4 +144,9 @@ class ModelTuning:
     def run(self):
         objective = self.create_objetive()
         study = self.optimize(objective)
-        return study
+        best_value = study.best_value
+        best_trial_cfg = study.best_trial.user_attrs['config']
+        best_model_params = best_trial_cfg['model_params']
+        best_mlforecast_params = best_trial_cfg['mlf_init_params']
+        mlf_fit_params = best_trial_cfg['mlf_fit_params']
+        return best_value,best_model_params,best_mlforecast_params,mlf_fit_params
