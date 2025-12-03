@@ -25,6 +25,8 @@ class DatasetCreator:
         self.ds_col = self.config.get('ds_col', 'mes')  # Coluna de data
         self.y_col = self.config.get('y_col', 'venda_unidades')  # Coluna alvo
         self.debug = self.config.get('debug', False)
+        self.test_cutoff_start = self.config.get('split_dates',{}).get('test',{}).get('start',{})
+        self.test_cutoff_end = self.config.get('split_dates',{}).get('test',{}).get('end',{})
 
     def read_csv_files(self, path):
         """
@@ -211,6 +213,24 @@ class DatasetCreator:
         if self.debug:
             print(f"\nLimpeza concluída! Linhas finais: {len(df):,}")
         return df
+    
+    def drop_discontinued_series(self,df):
+        max_dates = df.groupby(['sku', 'loja'])['mes'].max()
+        
+        descontinuados = max_dates[max_dates < self.test_cutoff_start].index
+
+        df = df[~df.set_index(['sku', 'loja']).index.isin(descontinuados)]
+        
+        return df
+    
+    def drop_recent_series_with_no_training(self,df):
+        min_dates = df.groupby(['sku', 'loja'])['mes'].min()
+
+        series_sem_treino = min_dates[min_dates >= self.test_cutoff_start].index
+
+        df = df[~df.set_index(['sku', 'loja']).index.isin(series_sem_treino)]
+        return df
+
 
     def save_intermediary(self, df,filename='dataset.parquet'):
         """
@@ -259,6 +279,8 @@ class DatasetCreator:
         df = self.ajustes_preco_features(df)
         df = self.ajustar_decotes(df)
         df = self.create_total_hierarchy_level(df)
+        df = self.drop_recent_series_with_no_training(df)
+        df = self.drop_discontinued_series(df)
         df = self.remove_short_series_hierarchical(df,min_length = self.min_time_series_length)
         self.save_intermediary(df,filename='dataset.parquet')
         df = self.load_intermediary(filename='dataset.parquet')

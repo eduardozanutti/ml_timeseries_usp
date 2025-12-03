@@ -1,24 +1,27 @@
 {
-    "main_metric": 0.9540697196803619,
+    "main_metric": 0.7314662871310205,
     "metrics": {
-        "rmse": 29542.83022314835,
-        "rmsse": 0.9540697196803619,
-        "mase": 0.9066038440644106,
-        "smape": 0.18933553189280028
+        "model": "LGBMRegressor",
+        "rmse": 234.8638226075505,
+        "rmsse": 0.7314662871310205,
+        "mase": 0.7724717316763842,
+        "smape": 0.30456072457630107,
+        "wrmsse": 0.0,
+        "notes": "cv_results"
     },
     "model_params": {
         "objective": "poisson",
         "verbosity": -1,
         "n_jobs": -1,
-        "learning_rate": 0.014811201238503054,
-        "feature_fraction": 0.8925522638392513,
-        "bagging_fraction": 0.8184591497128225,
-        "lambda_l1": 0.09123210291212154,
-        "lambda_l2": 0.5920599659166005,
-        "num_leaves": 28,
-        "max_depth": 6,
-        "min_data_in_leaf": 6,
-        "n_estimators": 2409
+        "learning_rate": 0.011552609520026576,
+        "feature_fraction": 0.8580945732187625,
+        "bagging_fraction": 0.9266415740122277,
+        "lambda_l1": 3.1982428566503605e-07,
+        "lambda_l2": 0.00012481658849905204,
+        "num_leaves": 64,
+        "max_depth": 3,
+        "min_data_in_leaf": 19,
+        "n_estimators": 1288
     },
     "mlf_params": {
         "lags": [
@@ -41,9 +44,7 @@
                 "rolling_mean_3"
             ]
         },
-        "target_transforms": [
-            "boxcox"
-        ],
+        "target_transforms": [],
         "date_features": [
             "month",
             "quarter",
