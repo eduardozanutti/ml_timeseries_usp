@@ -143,6 +143,7 @@ class ModelTuning:
 
     def run(self):
         objective = self.create_objetive()
+        print(self.fixed_params)
         study = self.optimize(objective)
         best_value = study.best_value
         best_trial_cfg = study.best_trial.user_attrs['config']
