@@ -7,6 +7,8 @@ from src.utils.presets import lag_transforms_to_config,target_transforms_to_conf
 from utilsforecast.losses import rmse, mae, smape, mase, scaled_crps, mqloss,rmsse
 import json
 import pandas as pd
+from src.evaluation.metrics import get_metric
+import matplotlib.pyplot as plt
 
 
 class CreateCanditateModel:
@@ -14,12 +16,14 @@ class CreateCanditateModel:
         self.model_path = config['paths']['models']['candidates_model_path']
         self.df = df
         self.cv_config = cv_config
+        self.seasonality = config['seasonality']
         self.type_model = type_model
         self.model_name = model_name
         self.model = get_model_class(model_name)
         self.compare_metrics = compare_metrics
         self.metric = metric
         self.cv_metric = cv_metric
+        self.scaled_metrics = config['evaluation']['scaled_metrics']
         self.model_params = model_params
         self.mlf_params = mlf_params
         self.mlf_fit_params = mlf_fit_params
@@ -27,29 +31,9 @@ class CreateCanditateModel:
         self.step_size = cv_config.get('step_size',{})
         self.h = cv_config.get('h',{})
         self.evaluation_path = config['paths']['evaluation']['evaluation_path']
-
-    def _calculate_wrsse(self,df,models,seasonality,train_df):
-        """
-        Calcula o WRSSE: RMSSE ponderado pelo volume de vendas no treino
-        """
-        # RMSSE por série
-        rmsse_per_series = rmsse(
-            df, 
-            models=[models], 
-            seasonality=seasonality, 
-            train_df=train_df
-        )[models]
-
-        # Volume de vendas no período in-sample (treino) por série
-        sales_volume = train_df.groupby('unique_id')['y'].sum()
-
-        # Peso = volume da série / volume total
-        weights = sales_volume / sales_volume.sum()
-
-        # WRSSE = soma (RMSSE da série * peso da série)
-        wrsse = (rmsse_per_series * weights.reindex(rmsse_per_series.index, fill_value=0)).sum()
-
-        return round(wrsse, 6)
+        self.output_plots_path = config['paths']['plots']['plots_path']
+        self.time_col = config['time_col']
+        self.target_col = config['target_col']
     
     def create_mlf_model(self):
         model_artifact = MLForecast(
@@ -67,43 +51,95 @@ class CreateCanditateModel:
         )
         return model_artifact
     
-    def cross_validation(self,model_artifact,train_df=None,seasonality=None):
-        train_df = self.df
-        seasonality = 12
-        metric_map = {
-            'wrmsse': lambda df: self._calculate_wrsse(df,models=self.model_name,seasonality=12,train_df=train_df),
-            'smape': lambda df: smape(df, models=[self.model_name])[self.model_name].mean(),
-            'mase':  lambda df: mase(df, models=[self.model_name], seasonality=seasonality,train_df=train_df)[self.model_name].mean(),
-            'rmsse': lambda df: rmsse(df, models=[self.model_name],seasonality=12,train_df=train_df)[self.model_name].mean(),
-            'rmse':  lambda df: rmse(df,models=[self.model_name])[self.model_name].mean()
-        }
+    def cross_validation(self,model_artifact,static_features=None):
+        #Column model
+        results_metrics = {'model':self.model_name}
 
         cv_df = model_artifact.cross_validation(
                                      df=self.df,
                                      h=self.h,
                                      n_windows=self.n_windows,
-                                     step_size=self.step_size
+                                     step_size=self.step_size,
+                                     static_features=static_features
                                      )
-        #update best metric
-        self.metric = metric_map[self.cv_metric](cv_df)
-        results_metrics = {'model':self.model_name}
-        results_metrics.update({mtrc: metric_map[mtrc](cv_df) for mtrc in self.compare_metrics})
+        #Column for each metric
+        for metric in self.compare_metrics:
+            if metric in self.scaled_metrics:
+                results_metrics.update({metric:get_metric(
+                                                df = cv_df,
+                                                metric_name = metric,
+                                                model_name = self.model_name,
+                                                seasonality = self.seasonality,
+                                                train_df = self.df
+                                                )}
+                                        )
+            else:
+                results_metrics.update({metric:get_metric(
+                                                df = cv_df,
+                                                metric_name = metric,
+                                                model_name = self.model_name,
+                                                )}
+                                        )
+        
+        #Column for notes
         results_metrics.update({'notes':'cv_results'})
+        
+        self.create_cross_validation_plots(cv_df)
+
         return results_metrics
     
+    def plot_cv(self, df_cv,fname,uid, last_n=24 * 14):
+        cutoffs = df_cv.query('unique_id == @uid')['cutoff'].unique()
+        fig, ax = plt.subplots(nrows=len(cutoffs), ncols=1, figsize=(14, 6), gridspec_kw=dict(hspace=0.8))
+        for cutoff, axi in zip(cutoffs, ax.flat):
+            self.df.query('unique_id == @uid').tail(last_n).set_index(self.time_col).plot(ax=axi, title=uid, y=self.target_col)
+            df_cv.query('unique_id == @uid & cutoff == @cutoff').set_index(self.time_col).plot(ax=axi, title=uid, y=self.model_name)
+        fig.savefig(fname, bbox_inches='tight')
+        plt.close()
+        return
+    
+    def create_cross_validation_plots(self,df_cv):
+        plot_model_path = os.path.join(self.output_plots_path,self.model_name)
+        cv_plot_model_path = os.path.join(plot_model_path,'cross_validation')
+        if not os.path.exists(cv_plot_model_path):
+            os.makedirs(cv_plot_model_path)
+        for uid in self.df['unique_id'].unique():
+            if len(uid.split('/')) == 1:
+                fname = os.path.join(cv_plot_model_path,uid)
+            else:
+                folder = uid.split('/')[-2]
+                file_name = uid.split('/')[-1]
+                path_file = os.path.join(cv_plot_model_path,folder)
+                if not os.path.exists(path_file):
+                    os.mkdir(path_file)
+                fname = os.path.join(path_file,file_name)
+            try:
+                self.plot_cv(df_cv,fname,uid)
+            except Exception as e:
+                print(e)
+                pass
+        return
+        
     def save_evaluation_metrics(self,results_metrics,filename='metrics_summary.csv'):
         
         if not os.path.exists(self.evaluation_path):
             os.makedirs(self.evaluation_path)
+            
 
         evaluation_file = os.path.join(self.evaluation_path,filename)
         
         if not os.path.exists(evaluation_file):
-            pd.DataFrame(columns=[
-                'model', 'wrmsse', 'smape','mase','rmsse','rmse', 'notes'
-            ]).to_csv(evaluation_file, index=False)
+            evaluation_csv = pd.DataFrame(
+                                            columns=['model'] + self.compare_metrics + ['notes']
+                                        )
+            evaluation_csv.to_csv(evaluation_file, index=False)
+        else:
+            pass
         
-        pd.DataFrame([results_metrics]).to_csv(evaluation_file, mode='a', header=False, index=False)
+        
+        evaluation_csv = pd.DataFrame([results_metrics])
+        evaluation_csv.to_csv(evaluation_file, mode='a', header=False, index=False)
+
         return
     
     def fit_model(self,model_artifact):
@@ -192,10 +228,12 @@ class CreateCanditateModel:
 
         if self.type_model == 'statsforecast':
             model_artifact = self.create_stats_model()
+            results_metrics = self.cross_validation(model_artifact)
         else:
+            static_features = self.mlf_fit_params['static_features']
             model_artifact = self.create_mlf_model()
-        
-        results_metrics = self.cross_validation(model_artifact)
+            results_metrics = self.cross_validation(model_artifact,static_features=static_features)
+            pass
         
         self.save_evaluation_metrics(results_metrics)
         

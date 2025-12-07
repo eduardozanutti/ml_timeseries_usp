@@ -4,6 +4,7 @@ from utilsforecast.losses import rmse, mae, smape, mase, scaled_crps, mqloss,rms
 from utilsforecast.plotting import plot_series
 import os
 import pandas as pd
+from src.evaluation.metrics import get_metric
 
 class ModelEvaluate:
     def __init__(self, model_name, fitted_values, train, test, n_months_test, validation_metric,compare_metrics,config, candidate_model=None, prediction=False):
@@ -23,60 +24,62 @@ class ModelEvaluate:
         prediction = self.candidate_model.predict(self.n_months_test)
         return prediction
     
-    def _calculate_wrsse(self, df_pred):
-        """
-        Calcula o WRSSE: RMSSE ponderado pelo volume de vendas no treino
-        """
-        # RMSSE por série
-        rmsse_per_series = rmsse(
-            df_pred, 
-            models=[self.model_name], 
-            seasonality=12, 
-            train_df=self.train
-        )[self.model_name]
-
-        # Volume de vendas no período in-sample (treino) por série
-        sales_volume = self.train.groupby('unique_id')['y'].sum()
-
-        # Peso = volume da série / volume total
-        weights = sales_volume / sales_volume.sum()
-
-        # WRSSE = soma (RMSSE da série * peso da série)
-        wrsse = (rmsse_per_series * weights.reindex(rmsse_per_series.index, fill_value=0)).sum()
-
-        return round(wrsse, 6)
-    
 
     def evaluate(self,df_pred):
-        seasonality = 12
-        metric_map = {
-            'smape': lambda df: smape(df, models=[self.model_name])[self.model_name].mean(),
-            'mase':  lambda df: mase(df, models=[self.model_name], seasonality=seasonality,train_df=self.train)[self.model_name].mean(),
-            'rmsse': lambda df: rmsse(df, models=[self.model_name],seasonality=seasonality,train_df=self.train)[self.model_name].mean(),
-            'rmse':  lambda df: rmse(df,models=[self.model_name])[self.model_name].mean(),
-            'wrmsse': lambda df: self._calculate_wrsse(df),
-        }
+
+        results_metrics = {'model':self.model_name}
 
         #update best metric
-        validation_metric = metric_map[self.validation_metric](df_pred)
-        results_metrics = {'model':self.model_name}
-        results_metrics.update({mtrc: metric_map[mtrc](df_pred) for mtrc in self.compare_metrics})
-        results_metrics.update({'notes':'final_model'})
+        validation_metric = {self.validation_metric: get_metric(
+                                            df = df_pred,
+                                            metric_name = self.validation_metric,
+                                            model_name = self.model_name,
+                                            seasonality = self.seasonality,
+                                            train_df = self.df)
+        }
+        #Column for each metric
+        for metric in self.compare_metrics:
+            if metric in self.scaled_metrics:
+                results_metrics.update({metric:get_metric(
+                                                df = df_pred,
+                                                metric_name = metric,
+                                                model_name = self.model_name,
+                                                seasonality = self.seasonality,
+                                                train_df = self.df
+                                                )}
+                                        )
+            else:
+                results_metrics.update({metric:get_metric(
+                                                df = df_pred,
+                                                metric_name = metric,
+                                                model_name = self.model_name,
+                                                )}
+                                        )
+        
+        #Column for notes
+        results_metrics.update({'notes':'cv_results'})
         return validation_metric,results_metrics
     
     def save_evaluation_metrics(self,results_metrics,filename='metrics_summary.csv'):
         
         if not os.path.exists(self.evaluation_path):
             os.makedirs(self.evaluation_path)
+            
 
         evaluation_file = os.path.join(self.evaluation_path,filename)
         
         if not os.path.exists(evaluation_file):
-            pd.DataFrame(columns=[
-                'model', 'wrmsse', 'rmse', 'rmsse', 'mase', 'smape', 'notes'
-            ]).to_csv(evaluation_file, index=False)
+            evaluation_csv = pd.DataFrame(
+                                            columns=['model'] + self.compare_metrics + ['notes']
+                                        )
+            evaluation_csv.to_csv(evaluation_file, index=False)
+        else:
+            pass
         
-        pd.DataFrame([results_metrics]).to_csv(evaluation_file, mode='a', header=False, index=False)
+        
+        evaluation_csv = pd.DataFrame([results_metrics])
+        evaluation_csv.to_csv(evaluation_file, mode='a', header=False, index=False)
+
         return
     
     def plot_time_series(self,df):

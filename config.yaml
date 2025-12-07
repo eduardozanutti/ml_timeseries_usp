@@ -1,8 +1,8 @@
 # === EXTRAS ===
-debug: false
+debug: true
 remove_outliers: false
 exogen_features: false
-cache: true
+cache: false
 
 # === CONFIGURAÇÃO DOS DADOS ===
 ds_col: mes
@@ -24,11 +24,17 @@ outlier:
   iqr_factor: 3.0
   season_length: 12
 
+seasonality:
+  12
+
 paths:
   data:
     raw_path: data/raw/
     interim_path: data/interim/
     processed_path: data/processed/
+  features:
+    numeric: features/numeric
+    static: features/static
   models:
     candidates_model_path: models/candidates
     champion_model_path: models/champion
@@ -45,7 +51,7 @@ hierarchical_spec:
   - ['total']
   - ['total','produto']
   - ['total','produto','centro_distribuicao']
-  - ['total','produto','centro_distribuicao',loja]
+  #- ['total','produto','centro_distribuicao',loja]
   #- ['total','centro_distribuicao','regiao_loja']
   #- ['total','centro_distribuicao','regiao_loja','clima_loja']
   #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja']
@@ -56,13 +62,23 @@ hierarchical_spec:
 # === FEATURES ===
 features:
   categorical_features:
+    - material
+    - sku
     - cor
     - tamanho
-    - padronagem
     - construcao
+    - padronagem
     - marca
     - decote
     - detalhe
+    - idade_loja
+    - uf_loja
+    - cidade_loja
+    - regiao_loja
+    - bairro_loja
+    - clima_loja
+    - perfil_loja
+    - porte_loja
 
   numerical_features:
     - estoque_unidades_inicio
@@ -70,24 +86,59 @@ features:
     - estoque_unidades
     - estoque_unidades_mediana
     - prop_dias_com_estoque
-    - preco_unitario
-    - desconto_percentual
-    - desconto_absoluto
-    - tem_preco_original
-    - prop_dias_com_venda
+    - venda_valor_total
+    - prop_dias_com_venda 
     - total_observacoes_vendas
+    - pedidos 
     - pedidos_m1
-    - pedidos_m2
+    - pedidos_m2 
     - pedidos_m3
     - pedidos_m4
-    - pedidos_m5
+    - pedidos_m5 
     - pedidos_m6
-    - pedidos_m7  
+    - pedidos_m7 
+    - pedidos_m8
+    - pedidos_m9
+    - pedidos_m10
+    - pedidos_m11
+    - pedidos_m12
+    - preco_unitario
+    - desconto_percentual 
+    - desconto_absoluto
+    - tem_preco_original
+    - temperature_2m_mean
+    - temperature_2m_max
+    - temperature_2m_min
+    - apparent_temperature_mean
+    - apparent_temperature_max
+    - apparent_temperature_min
+    - precipitation_sum
+    - rain_sum
+    - snowfall_sum
+    - wind_speed_10m_max
+    - wind_gusts_10m_max
+    - shortwave_radiation_sum
 
-  external_features:
-    - weather_temperature
-    - weather_preassure
-    - weather_precipitation
+  weather_features:
+    api: 
+      open-meteo:
+        url: https://archive-api.open-meteo.com/v1/archive
+        features:
+          - temperature_2m_mean
+          - temperature_2m_max
+          - temperature_2m_min
+          - apparent_temperature_mean
+          - apparent_temperature_max
+          - apparent_temperature_min
+          - precipitation_sum
+          - rain_sum
+          - snowfall_sum
+          - wind_speed_10m_max
+          - wind_gusts_10m_max
+          - shortwave_radiation_sum
+        start_date: 2022-01-01
+        end_date: 2025-12-01
+        timezone: America/Sao_Paulo
 
   holiday_features:
     natal:
@@ -138,11 +189,11 @@ models:
       allow_writing_files: false
 
   XGBoost:
-    enabled: false
+    enabled: true
     type: mlforecast
     regressor: XGBRegressor
     fixed_params:
-      objective: reg:squarederror
+      objective: count:poisson
       eval_metric: mape
       n_jobs: -1
       seed: 42
@@ -213,14 +264,18 @@ modeling:
   training_metric:
     mase
   validation_metric:
-    wrmsse
-  compare_metrics:
-    - wrmsse
+    smape
+  train_compare_metrics:
+    - mase #1
+    - rmsse #2
     - smape
-    - mase
-    - rmsse 
-    - rmse
-    
+    - nd
+    #- rmae
+  test_compare_metrics:
+    - smape
+    - mape
+    - nd
+    #- rmae
   cv_config:
     h: 6
     n_windows: 6
@@ -286,28 +341,34 @@ modeling:
         basic: [month, quarter]
         full: [month, quarter, is_month_start, is_month_end]
 
-    
-
     fit_params:
       static_features:
-        - []
-      #  - sku
-      #  - loja
-      #  - produto
-      #  - material
-      #  - cor
-      #  - tamanho
-      #  - marca
-      #  - clima_loja
-
-    backtest:
-      enabled: true
-      n_months_test: 6
-      
+        - unique_id
+        - marca
+        - material
+        - construcao
+        - padronagem
+        - decote
+        - detalhe
+        - regiao_loja
+        - uf_loja
+        - clima_loja
+        - perfil_loja
+        - porte_loja
+        - sku
+        - tamanho
+        - cidade_loja
+        - bairro_loja
+        - cor
+        
     validation:
       metric: rmse
       n_trials: 100
       timeout: 14400
+evaluation:
+  scaled_metrics:
+    - rmsse
+    - mase
 
 # === ENSEMBLE ===
 ensemble:
@@ -337,52 +398,523 @@ optuna:
     n_startup_trials: 40
   metric: rmsse
 
+# ==  COORDENATES == 
+coordenates:
+  ac:
+    acre:
+      dist industrial: {lat: -9.9754, lon: -67.8242}
+
+  al:
+    alagoas:
+      centro: {lat: -9.6667, lon: -35.7350}
+      cidade universitaria: {lat: -9.6667, lon: -35.7350}
+      cruz das almas: {lat: -9.6869, lon: -35.7556}
+      mangabeira: {lat: -9.6667, lon: -35.7350}
+      santa edwiges: {lat: -9.6667, lon: -35.7333}
+
+  am:
+    amazonas:
+      adrianopolis: {lat: -3.1190, lon: -60.0265}
+      centro: {lat: -3.1190, lon: -60.0265}
+      chapada: {lat: -3.1190, lon: -60.0265}
+      cidade nova: {lat: -3.1190, lon: -60.0265}
+      monte das oliveiras: {lat: -3.1190, lon: -60.0265}
+      ponta negra: {lat: -3.1190, lon: -60.0265}
+      sao jose operario: {lat: -3.1190, lon: -60.0265}
+
+  ap:
+    amapa:
+      centro: {lat: -0.0356, lon: -51.0705}
+      universidade: {lat: -0.0356, lon: -51.0705}
+
+  ba:
+    bahia:
+      barra: {lat: -12.9709, lon: -38.4621}
+      cabula: {lat: -12.9709, lon: -38.4621}
+      caminho das arvores: {lat: -12.9709, lon: -38.4621}
+      candeias: {lat: -12.9709, lon: -38.4621}
+      centro: {lat: -12.9709, lon: -38.5121}
+      felicia: {lat: -12.9709, lon: -38.4621}
+      goes calmon: {lat: -12.9709, lon: -38.4621}
+      paralela: {lat: -12.9709, lon: -38.4621}
+      piedade: {lat: -12.9709, lon: -38.4621}
+      sao cristovao: {lat: -12.9709, lon: -38.4621}
+      sao joao: {lat: -12.9709, lon: -38.4621}
+      vila verde: {lat: -12.9709, lon: -38.4621}
+
+  ce:
+    ceara:
+      agua fria: {lat: -3.7406, lon: -38.4785}
+      benfica: {lat: -3.7406, lon: -38.4785}
+      centro: {lat: -3.7406, lon: -38.4785}
+      dom expedito: {lat: -3.7879, lon: -38.5381}
+      jereissati ii: {lat: -3.8623, lon: -38.4819}
+      joquei clube: {lat: -3.7879, lon: -38.5381}
+      papicu: {lat: -3.7406, lon: -38.4785}
+      parangaba: {lat: -3.7406, lon: -38.4785}
+      presidente kennedy: {lat: -3.7406, lon: -38.4785}
+      sapiranga: {lat: -3.7879, lon: -38.5381}
+      sao gerardo: {lat: -3.7406, lon: -38.4785}
+      triangulo: {lat: -3.7879, lon: -38.5381}
+
+  df:
+    brasilia:
+      asa norte: {lat: -15.8267, lon: -48.0264}
+      asa sul011: {lat: -15.8267, lon: -48.0264}
+      centro: {lat: -15.8267, lon: -48.0264}
+      setor area isol sudoe.: {lat: -15.8267, lon: -48.0264}
+      taguatinga: {lat: -15.8267, lon: -48.0264}
+      taguatinga norte: {lat: -15.8267, lon: -48.0264}
+      taquatinga: {lat: -15.8267, lon: -48.0264}
+
+  es:
+    espirito santo:
+      centro de vila velha: {lat: -20.2976, lon: -40.3390}
+      colina de laranjeiras: {lat: -20.2976, lon: -40.3390}
+      enseada do sua: {lat: -20.2976, lon: -40.3390}
+      eurico salles: {lat: -20.2976, lon: -40.3390}
+      jockey de itaparica: {lat: -20.2976, lon: -40.3390}
+      movelar: {lat: -20.2976, lon: -40.3390}
+      praia da costa: {lat: -20.2976, lon: -40.3390}
+      sao francisco: {lat: -20.2976, lon: -40.3390}
+
+  go:
+    goias:
+      aeroviario: {lat: -16.6869, lon: -49.2648}
+      capuava: {lat: -16.6869, lon: -49.2648}
+      centro: {lat: -16.6869, lon: -49.2648}
+      fazenda caveiras: {lat: -16.6869, lon: -49.2648}
+      mansoes centro oeste: {lat: -16.6869, lon: -49.2648}
+      parque esplanada iii: {lat: -16.6869, lon: -49.2648}
+      quadra26 lote 15: {lat: -16.6869, lon: -49.2648}
+      residencial jardim campestre: {lat: -16.6869, lon: -49.2648}
+      setor bueno: {lat: -16.6869, lon: -49.2648}
+      setor jardim goias: {lat: -16.6869, lon: -49.2648}
+      setor serra dourada - 4a etapa: {lat: -16.6869, lon: -49.2648}
+      vila sao tomaz: {lat: -16.6869, lon: -49.2648}
+
+  ma:
+    maranhao:
+      bela vista: {lat: -2.5307, lon: -44.3068}
+      calhau: {lat: -2.5307, lon: -44.3068}
+      centro: {lat: -2.5307, lon: -44.3068}
+      cohama: {lat: -2.5307, lon: -44.3068}
+      cruzeiro do anil: {lat: -2.5307, lon: -44.3068}
+      jaracaty: {lat: -2.5307, lon: -44.3068}
+      saramanta: {lat: -2.5307, lon: -44.3068}
+
+  mg:
+    minas gerais:
+      barreiro: {lat: -19.9239, lon: -43.9386}
+      belvedere: {lat: -19.9239, lon: -43.9386}
+      caicara: {lat: -19.9239, lon: -43.9386}
+      centro: {lat: -19.9239, lon: -43.9386}
+      cidade industrial: {lat: -19.9239, lon: -43.9386}
+      cidade nova: {lat: -19.9239, lon: -43.9386}
+      horto: {lat: -19.9239, lon: -43.9386}
+      inga alto: {lat: -19.9239, lon: -43.9386}
+      ipiranga: {lat: -19.9239, lon: -43.9386}
+      jardim petropolis: {lat: -19.9239, lon: -43.9386}
+      mariano procopio: {lat: -21.7633, lon: -43.3500}
+      morada da colina: {lat: -19.9239, lon: -43.9386}
+      ressaca: {lat: -19.9239, lon: -43.9386}
+      santa clara: {lat: -19.9239, lon: -43.9386}
+      santa efigenia: {lat: -19.9239, lon: -43.9386}
+      santa monica: {lat: -19.9239, lon: -43.9386}
+      sao benedito: {lat: -19.9239, lon: -43.9386}
+      sao joao: {lat: -19.9239, lon: -43.9386}
+      sao paulo: {lat: -19.9239, lon: -43.9386}
+      sao pedro: {lat: -19.9239, lon: -43.9386}
+      vila cloris: {lat: -19.9239, lon: -43.9386}
+
+  ms:
+    mato grosso do sul:
+      centro: {lat: -20.4422, lon: -54.6461}
+      coronel antonio: {lat: -20.4422, lon: -54.6461}
+      portal das araras: {lat: -20.4422, lon: -54.6461}
+      santa fe: {lat: -20.4422, lon: -54.6461}
+
+  mt:
+    mato grosso:
+      bosque da saude: {lat: -15.5989, lon: -56.0949}
+      centro: {lat: -15.5989, lon: -56.0949}
+      dom aquino: {lat: -15.5989, lon: -56.0949}
+      jardim aeroporto: {lat: -15.5989, lon: -56.0949}
+      jardim das americas: {lat: -15.5989, lon: -56.0949}
+      setor industrial: {lat: -15.5989, lon: -56.0949}
+
+  pa:
+    para:
+      batista campos: {lat: -1.4558, lon: -48.4902}
+      castanheira: {lat: -1.4558, lon: -48.4902}
+      centro: {lat: -1.4558, lon: -48.4902}
+      coqueiros: {lat: -5.3639, lon: -49.1103}
+      nova maraba: {lat: -5.3639, lon: -49.1103}
+      nucleo res e servicos carajas: {lat: -6.0681, lon: -49.8689}
+      parque verde: {lat: -1.4558, lon: -48.4902}
+      reduto: {lat: -1.4558, lon: -48.4902}
+      santarenzinho: {lat: -2.4431, lon: -54.7089}
+
+  pb:
+    paraiba:
+      bela vista: {lat: -7.1186, lon: -34.8467}
+      catole: {lat: -7.1186, lon: -34.8467}
+      manaira: {lat: -7.1186, lon: -34.8467}
+      mangabeira: {lat: -7.1186, lon: -34.8467}
+      tambia: {lat: -7.1186, lon: -34.8467}
+
+  pe:
+    pernambuco:
+      boa viagem: {lat: -8.1049, lon: -34.9109}
+      boa vista: {lat: -8.0600, lon: -34.8800}
+      casa caiada: {lat: -7.9939, lon: -34.8361}
+      centro: {lat: -8.0600, lon: -34.8800}
+      cidade garapu: {lat: -8.0600, lon: -34.8800}
+      indianopolis: {lat: -8.1049, lon: -34.9109}
+      mauricio de nassau: {lat: -8.0600, lon: -34.8800}
+      piedade: {lat: -8.1049, lon: -34.9109}
+      pina: {lat: -8.1049, lon: -34.9109}
+      redencao: {lat: -8.0600, lon: -34.8800}
+      santo amaro: {lat: -8.0600, lon: -34.8800}
+      santo antonio: {lat: -8.0600, lon: -34.8800}
+      vila da fabrica: {lat: -8.1049, lon: -34.9109}
+
+  pi:
+    piaui:
+      cabral: {lat: -5.0892, lon: -42.8016}
+      centro: {lat: -5.0892, lon: -42.8016}
+      noivos: {lat: -5.0892, lon: -42.8016}
+      reis veloso: {lat: -2.8817, lon: -41.7494}
+
+  pr:
+    parana:
+      agua verde: {lat: -25.4289, lon: -49.2731}
+      centro: {lat: -25.4289, lon: -49.2731}
+      cidade dos lagos: {lat: -25.4289, lon: -49.2731}
+      gleba fazenda palhano: {lat: -23.3100, lon: -51.1614}
+      helena: {lat: -25.4289, lon: -49.2731}
+      mossungue: {lat: -25.4289, lon: -49.2731}
+      olarias: {lat: -25.4289, lon: -49.2731}
+      parque industrial bandeirantes: {lat: -25.4289, lon: -49.2731}
+      regiao do lago: {lat: -25.4289, lon: -49.2731}
+      taruma: {lat: -25.4289, lon: -49.2731}
+      vila yolanda: {lat: -25.4289, lon: -49.2731}
+      zona 01: {lat: -23.3100, lon: -51.1614}
+      zona iii: {lat: -23.3100, lon: -51.1614}
+
+  rj:
+    rio de janeiro:
+      alcantara: {lat: -22.9068, lon: -43.1729}
+      andarai: {lat: -22.9068, lon: -43.1729}
+      anil: {lat: -22.9068, lon: -43.1729}
+      bangu: {lat: -22.9068, lon: -43.1729}
+      barra da tijuca: {lat: -22.9068, lon: -43.1729}
+      bairro da luz: {lat: -22.9068, lon: -43.1729}
+      botafogo: {lat: -22.9068, lon: -43.1729}
+      cabo frio: {lat: -22.9068, lon: -43.1729}
+      campo grande: {lat: -22.9068, lon: -43.1729}
+      centro: {lat: -22.9068, lon: -43.1729}
+      del castilho: {lat: -22.9068, lon: -43.1729}
+      ipanema: {lat: -22.9068, lon: -43.1729}
+      jardim alvorada: {lat: -22.9068, lon: -43.1729}
+      jardim sulacap: {lat: -22.9068, lon: -43.1729}
+      madureira: {lat: -22.9068, lon: -43.1729}
+      paraiso: {lat: -22.9068, lon: -43.1729}
+      parque duque: {lat: -22.9068, lon: -43.1729}
+      parque leopoldina: {lat: -22.9068, lon: -43.1729}
+      pilares: {lat: -22.9068, lon: -43.1729}
+      recreio dos bandeirantes: {lat: -22.9068, lon: -43.1729}
+      sao geraldo: {lat: -22.9068, lon: -43.1729}
+      taquara: {lat: -22.9068, lon: -43.1729}
+      venda velha: {lat: -22.9068, lon: -43.1729}
+      vila da penha: {lat: -22.9068, lon: -43.1729}
+      vila ibirapitanga: {lat: -22.9068, lon: -43.1729}
+
+  rn:
+    rio grande do norte:
+      centro: {lat: -5.7793, lon: -35.2009}
+      nova betania: {lat: -5.7793, lon: -35.2009}
+      potengi: {lat: -5.7793, lon: -35.2009}
+      tirol: {lat: -5.7793, lon: -35.2009}
+
+  ro:
+    rondonia:
+      flodoaldo pontes pinto: {lat: -8.7619, lon: -63.9039}
+
+  rr:
+    roraima:
+      aeroporto: {lat: 2.8208, lon: -60.6718}
+      cacari: {lat: 2.8208, lon: -60.6718}
+
+  rs:
+    rio grande do sul:
+      areal: {lat: -30.0346, lon: -51.2177}
+      centro: {lat: -30.0346, lon: -51.2177}
+      centro historico: {lat: -30.0346, lon: -51.2177}
+      cristal: {lat: -30.0346, lon: -51.2177}
+      cristo redentor: {lat: -30.0346, lon: -51.2177}
+      industrial: {lat: -30.0346, lon: -51.2177}
+      marechal rondon: {lat: -30.0346, lon: -51.2177}
+      passo d areia: {lat: -30.0346, lon: -51.2177}
+      passo da areia: {lat: -30.0346, lon: -51.2177}
+      passo das pedras: {lat: -30.0346, lon: -51.2177}
+      praia de belas: {lat: -30.0346, lon: -51.2177}
+      parque residencial sao pedro: {lat: -30.0346, lon: -51.2177}
+      renasenca: {lat: -30.0346, lon: -51.2177}
+      vila rodrigues: {lat: -30.0346, lon: -51.2177}
+
+  sc:
+    santa catarina:
+      aeroporto: {lat: -27.5957, lon: -48.5480}
+      barreiros: {lat: -27.5957, lon: -48.5480}
+      bom retiro: {lat: -26.9046, lon: -49.0679}
+      centro: {lat: -26.9046, lon: -49.0679}
+      distrito industrial: {lat: -26.9046, lon: -49.0679}
+      dos estados: {lat: -26.9046, lon: -49.0679}
+      guaruja: {lat: -27.5957, lon: -48.5480}
+      lider: {lat: -26.9046, lon: -49.0679}
+      nossa senhora da salete: {lat: -26.9046, lon: -49.0679}
+      saco grande: {lat: -27.5957, lon: -48.5480}
+      salto norte: {lat: -26.9046, lon: -49.0679}
+
+  se:
+    sergipe:
+      centro: {lat: -10.9179, lon: -37.0731}
+      coroa do meio: {lat: -10.9179, lon: -37.0731}
+      dis: {lat: -10.9179, lon: -37.0731}
+      industrial: {lat: -10.9179, lon: -37.0731}
+      jardins: {lat: -10.9179, lon: -37.0731}
+
+  sp:
+    sao paulo:
+      agua branca: {lat: -23.5505, lon: -46.6333}
+      anhangabau: {lat: -23.5505, lon: -46.6333}
+      aparecida: {lat: -23.5505, lon: -46.6333}
+      bela vista: {lat: -23.5505, lon: -46.6333}
+      campo novo: {lat: -23.5505, lon: -46.6333}
+      centro: {lat: -23.5505, lon: -46.6333}
+      ceramica: {lat: -23.5505, lon: -46.6333}
+      chacara das flores: {lat: -23.5505, lon: -46.6333}
+      consolacao: {lat: -23.5505, lon: -46.6333}
+      estacao: {lat: -23.5505, lon: -46.6333}
+      guanabara: {lat: -22.9083, lon: -47.0603}
+      indianopolis: {lat: -23.5505, lon: -46.6333}
+      itapegica vila herminia: {lat: -23.5505, lon: -46.6333}
+      jaridm baronesa: {lat: -23.5505, lon: -46.6333}
+      jardim: {lat: -23.5505, lon: -46.6333}
+      jardim analia franco: {lat: -23.5505, lon: -46.6333}
+      jardim armenia: {lat: -23.5505, lon: -46.6333}
+      jardim bandeirantes: {lat: -23.5505, lon: -46.6333}
+      jardim britania: {lat: -23.5505, lon: -46.6333}
+      jardim california: {lat: -23.5505, lon: -46.6333}
+      jardim das rosas: {lat: -23.5505, lon: -46.6333}
+      jardim do lago: {lat: -23.5505, lon: -46.6333}
+      jardim flor da montanha: {lat: -23.5505, lon: -46.6333}
+      jardim ipaussurama: {lat: -23.5505, lon: -46.6333}
+      jardim madalena: {lat: -23.5505, lon: -46.6333}
+      jardim mollon: {lat: -23.5505, lon: -46.6333}
+      jardim paulista: {lat: -23.5505, lon: -46.6333}
+      jardim pirituba: {lat: -23.5505, lon: -46.6333}
+      jardim redentor: {lat: -23.5505, lon: -46.6333}
+      jardim santa cecilia: {lat: -23.5505, lon: -46.6333}
+      jardim santa genebra: {lat: -22.9083, lon: -47.0603}
+      jardim satelite: {lat: -23.5505, lon: -46.6333}
+      jardim tropical: {lat: -23.5505, lon: -46.6333}
+      jardim umuarama: {lat: -23.5505, lon: -46.6333}
+      jd america: {lat: -23.5505, lon: -46.6333}
+      lageadinho: {lat: -23.5505, lon: -46.6333}
+      lauzane paulista: {lat: -23.5505, lon: -46.6333}
+      morumbi: {lat: -23.5505, lon: -46.6333}
+      nossa senhora do perpetuo socorro: {lat: -23.5505, lon: -46.6333}
+      nova aldeinha: {lat: -23.5505, lon: -46.6333}
+      parada inglesa: {lat: -23.5505, lon: -46.6333}
+      paraiso: {lat: -23.5505, lon: -46.6333}
+      parque faber castell i: {lat: -23.5505, lon: -46.6333}
+      parque morumbi: {lat: -23.5505, lon: -46.6333}
+      pedro cavalini: {lat: -23.5505, lon: -46.6333}
+      perdizes: {lat: -23.5505, lon: -46.6333}
+      pinheiros: {lat: -23.5505, lon: -46.6333}
+      pirituba: {lat: -23.5505, lon: -46.6333}
+      q paineiras: {lat: -23.5505, lon: -46.6333}
+      residencial eco village i: {lat: -23.5505, lon: -46.6333}
+      ribeirania: {lat: -21.1775, lon: -47.8103}
+      santo amaro: {lat: -23.5505, lon: -46.6333}
+      sao luiz: {lat: -23.5505, lon: -46.6333}
+      sitio do campo: {lat: -23.5505, lon: -46.6333}
+      tambore: {lat: -23.5505, lon: -46.6333}
+      varjao: {lat: -23.5505, lon: -46.6333}
+      vila almeida: {lat: -23.5505, lon: -46.6333}
+      vila areiao: {lat: -23.7125, lon: -46.7428}
+      vila aricanduva: {lat: -23.5505, lon: -46.6333}
+      vila boa esperanca: {lat: -23.5505, lon: -46.6333}
+      vila brandina: {lat: -22.9083, lon: -47.0603}
+      vila campanela: {lat: -23.5505, lon: -46.6333}
+      vila do golf: {lat: -23.5505, lon: -46.6333}
+      vila fausto neves morelli: {lat: -23.5505, lon: -46.6333}
+      vila guilherme: {lat: -23.5505, lon: -46.6333}
+      vila marlene: {lat: -23.5505, lon: -46.6333}
+      vila olimpia: {lat: -23.5505, lon: -46.6333}
+      vila prudente: {lat: -23.5505, lon: -46.6333}
+      vila real: {lat: -23.5505, lon: -46.6333}
+      vila silviania: {lat: -23.5505, lon: -46.6333}
+      vila yara: {lat: -23.5505, lon: -46.6333}
+
+  to:
+    tocantins:
+      centro: {lat: -10.2129, lon: -48.3600}
+
+# == RENAMED COLUMNS == #
+columns_names:
+  weather:
+    date: mes
+    state: uf_loja
+    city: cidade_loja
+    district: bairro_loja
+
+feature_engineering:
+  # 5. Features temporais e de lag (obrigatórias)
+  exogen_lag_features:
+    lags: [6, 7, 8, 9, 10, 11, 12]
+    rolling: [3, 6]
+    expanding: True
+
+# == AGG RULES ==
+aggregation_rules:
+  # Colunas categóricas e como tratá-las automaticamente em qualquer groupby
+  categorical:
+    # === SEMPRE IGUAIS dentro do grupo → pegar o valor único (first) ===
+    first:
+      - marca
+      - material
+      - construcao
+      - padronagem
+      - decote
+      - detalhe
+      - regiao_loja
+      - uf_loja
+      - clima_loja
+      - perfil_loja
+      - porte_loja
+
+    # === VARIAM dentro do grupo, mas têm uma "principal" → pegar a moda ===
+    mode:
+      - cor
+
+    # === VARIAM muito → transformar só em contagem de valores únicos ===
+    nunique:
+      - sku
+      - tamanho
+      - cidade_loja
+      - bairro_loja
+  numerical:
+    sum:
+    - estoque_unidades_inicio
+    - estoque_unidades_fim
+    - estoque_unidades
+    - estoque_unidades_mediana
+    - venda_valor_total
+    - total_observacoes_vendas
+    - pedidos 
+    - pedidos_m1
+    - pedidos_m2 
+    - pedidos_m3
+    - pedidos_m4
+    - pedidos_m5 
+    - pedidos_m6
+    - pedidos_m7 
+    - pedidos_m8
+    - pedidos_m9
+    - pedidos_m10
+    - pedidos_m11
+    - pedidos_m12
+    - precipitation_sum
+    - rain_sum
+    - snowfall_sum
+    - shortwave_radiation_sum
+  mean:
+    - prop_dias_com_estoque
+    - prop_dias_com_venda
+    - preco_unitario
+    - desconto_percentual 
+    - desconto_absoluto
+    - tem_preco_original
+    - temperature_2m_mean
+    - apparent_temperature_mean
+  max:
+    - temperature_2m_max
+    - apparent_temperature_max
+    - wind_speed_10m_max
+    - wind_gusts_10m_max
+  min:
+    - temperature_2m_min
+    - apparent_temperature_min
+
 # === DTYPES ===
 dtypes:
-  material: object
-  sku: object
-  produto: object
-  cor: object
-  tamanho: object
-  construcao: object
-  padronagem: object
-  marca: object
-  decote: object
-  detalhe: object
-  loja: object
-  centro_distribuicao: object
-  idade_loja: int
-  uf_loja: object
-  cidade_loja: object
-  regiao_loja: object
-  bairro_loja: object
-  clima_loja: object
-  perfil_loja: object
-  porte_loja: object
-  estoque_unidades_inicio: int
-  estoque_unidades_fim: int
-  estoque_unidades: int
-  estoque_unidades_mediana: float
-  prop_dias_com_estoque: float
-  venda_unidades: int
-  venda_valor_total: float
-  preco_atual: float
-  preco_original: float
-  diff_preco: float
-  etiqueta: object
-  mes: datetime
-  prop_dias_com_venda: float
-  total_observacoes_vendas: int
-  pedidos: int
-  pedidos_m1: int
-  pedidos_m2: int
-  pedidos_m3: int
-  pedidos_m4: int
-  pedidos_m5: int
-  pedidos_m6: int
-  pedidos_m7: int
-  pedidos_m8: int
-  pedidos_m9: int
-  pedidos_m10: int
-  pedidos_m11: int
-  pedidos_m12: int
+  enterprise:
+    material: object
+    sku: object
+    produto: object
+    cor: object
+    tamanho: object
+    construcao: object
+    padronagem: object
+    marca: object
+    decote: object
+    detalhe: object
+    loja: object
+    centro_distribuicao: object
+    idade_loja: int
+    uf_loja: object
+    cidade_loja: object
+    regiao_loja: object
+    bairro_loja: object
+    clima_loja: object
+    perfil_loja: object
+    porte_loja: object
+    estoque_unidades_inicio: int
+    estoque_unidades_fim: int
+    estoque_unidades: int
+    estoque_unidades_mediana: float
+    prop_dias_com_estoque: float
+    venda_unidades: int
+    venda_valor_total: float
+    preco_atual: float
+    preco_original: float
+    diff_preco: float
+    etiqueta: object
+    mes: datetime
+    prop_dias_com_venda: float
+    total_observacoes_vendas: int
+    pedidos: int
+    pedidos_m1: int
+    pedidos_m2: int
+    pedidos_m3: int
+    pedidos_m4: int
+    pedidos_m5: int
+    pedidos_m6: int
+    pedidos_m7: int
+    pedidos_m8: int
+    pedidos_m9: int
+    pedidos_m10: int
+    pedidos_m11: int
+    pedidos_m12: int
+  weather:
+    date: datetime
+    state: object
+    city: object
+    district: object
+    latitude: object
+    longitude: object
+    temperature_2m_mean: float
+    temperature_2m_max: float
+    temperature_2m_min: float
+    apparent_temperature_mean: float
+    apparent_temperature_max: float
+    apparent_temperature_min: float
+    precipitation_sum: float
+    rain_sum: float
+    snowfall_sum: float
+    wind_speed_10m_max: float
+    wind_gusts_10m_max: float
+    shortwave_radiation_sum: float

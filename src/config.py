@@ -15,7 +15,7 @@ def load_config(config_path='config.yaml'):
         project_root = os.path.dirname(os.path.dirname(__file__))
         full_path = os.path.join(project_root, config_path)
         
-        with open(full_path, 'r') as f:
+        with open(full_path, 'r',encoding="utf-8") as f:
             config = yaml.safe_load(f)
         logging.info(f"Config carregado de {full_path}")
         return config

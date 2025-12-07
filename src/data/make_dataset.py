@@ -15,18 +15,24 @@ class DatasetCreator:
     """
     def __init__(self, config):
         self.config = config
+        self.weather_features = self.config.get('features',{}).get('weather_features',{}).get('api',{}).get('open-meteo',{}).get('features',{})
         self.data_path = self.config.get('paths', {}).get('data', {}).get('raw_path', 'data/raw/')
         self.output_path = self.config.get('paths', {}).get('data', {}).get('interim_path', 'data/interim/')
         self.min_time_series_length = self.config.get('min_time_series_length', 24)
         self.dtypes_dict = self.config.get('dtypes', {})  # ex: {'mes': 'datetime', 'marca': 'str'}
+        self.dtypes_dict_enterprise = self.dtypes_dict.get('enterprise',{})
+        self.dtypes_dict_weather = self.dtypes_dict.get('weather',{})
         self.hierarchical_spec = self.config.get('hierarchical_spec', [])  # ex: [['total'], ['total/marca'], ...]
         self.hierarchy = self.hierarchical_spec[-1] if self.hierarchical_spec else []
         self.columns_selected = self.config.get('columns_selected', None)
-        self.ds_col = self.config.get('ds_col', 'mes')  # Coluna de data
-        self.y_col = self.config.get('y_col', 'venda_unidades')  # Coluna alvo
+        self.ds_col = self.config.get('ds_col', 'mes')  
+        self.y_col = self.config.get('y_col', 'venda_unidades')  
+        self.time_col = self.config.get('time_col', 'ds')
+        self.target_col = self.config.get('target_col', 'y')
         self.debug = self.config.get('debug', False)
         self.test_cutoff_start = self.config.get('split_dates',{}).get('test',{}).get('start',{})
         self.test_cutoff_end = self.config.get('split_dates',{}).get('test',{}).get('end',{})
+        self.weather_col_names = self.config.get('columns_names','').get('weather','')
 
     def read_csv_files(self, path):
         """
@@ -42,8 +48,8 @@ class DatasetCreator:
         combined_df.sort_index(inplace=True)
         return combined_df
 
-    def read_all_csv_files(self):
-        all_managements = os.listdir(self.data_path)
+    def read_all_material_csv_files(self):
+        all_managements = [folder for folder in os.listdir(self.data_path) if folder != 'weather']
         data_list = []
         for management in all_managements:
             management_path = os.path.join(self.data_path,management)
@@ -52,17 +58,29 @@ class DatasetCreator:
                 material_path = os.path.join(management_path, material)
                 if os.path.isdir(material_path):
                     data_list.append(self.read_csv_files(material_path))
-                    df = pd.concat(data_list)
+        df = pd.concat(data_list)
         return df
+    
+    def read_all_weather_csv_files(self):
+        weathers = [folder for folder in os.listdir(self.data_path) if folder == 'weather']
+        weathers_path = os.path.join(self.data_path, weathers[0])
+        df_weather = self.read_csv_files(weathers_path)
+        return df_weather
 
-    def correcting_dtypes(self, df):
+    def correcting_dtypes(self,df,source='enterprise'):
         """
         Corrige tipos de dados baseado em dtypes_dict.
         """
         if self.debug:
             print("DEBUG: Iniciando correção de tipos de dados.")
 
-        for col, dtype in self.dtypes_dict.items():
+        if source == 'enterprise':
+            dtypes = self.dtypes_dict_enterprise
+        elif source == 'weather':
+            dtypes = self.dtypes_dict_weather 
+        else:
+            pass
+        for col, dtype in dtypes.items():
             if col in df.columns:
                 try:
                     if dtype == 'datetime':
@@ -79,6 +97,21 @@ class DatasetCreator:
         if self.debug:
             print(f"DEBUG: Correção de tipos concluída. Tipos atuais: {df.dtypes}")
 
+        return df
+    
+    def clean_string_columns(self,df):
+        string_cols = [col for col,type in df.dtypes.items() if type == 'O']
+        for col in string_cols:
+            df[col] = df[col].str.strip()                          # remove espaços no início/fim
+            df[col] = df[col].str.lower()                          # tudo minúsculo
+            df[col] = df[col].str.normalize('NFKD')                # remove acentos
+            df[col] = df[col].str.encode('ascii', errors='ignore') # remove caracteres especiais
+            df[col] = df[col].str.decode('utf-8')
+            df[col] = df[col].str.replace(r'[^a-z0-9\s]', ' ', regex=True)  # só letras, números e espaço
+            df[col] = df[col].str.replace(r'\s+', ' ', regex=True)          # múltiplos espaços → 1 só
+            df[col] = df[col].str.replace('-', '', regex=False).str.replace('.', '', regex=False)
+            if col == 'loja':
+                df[col] = df[col].str.replace(' ', '', regex=False)
         return df
 
     def stocks_removing_negatives(self, df):
@@ -147,6 +180,7 @@ class DatasetCreator:
         'decote u': 'u',
         'decote v': 'v'
         })
+        df['decote'] = df['decote'].fillna('sem decote')
         if self.debug:
             print("DEBUG: Ajuste de decotes concluído.")
     
@@ -230,6 +264,27 @@ class DatasetCreator:
 
         df = df[~df.set_index(['sku', 'loja']).index.isin(series_sem_treino)]
         return df
+    
+    def prepare_dataset_h_forecast(self,df):
+            df = df.dropna()
+            df = df.rename(columns={self.ds_col: self.time_col, self.y_col: self.target_col})
+            df['total'] = 'total'
+            df[self.time_col] = pd.to_datetime(df[self.time_col])
+            df = df.sort_values(self.time_col)
+            return df
+    
+    def correcting_weather_data_names(self,df_weather):
+            df_weather.rename(
+                columns = self.weather_col_names,inplace=True)
+            return df_weather
+    
+    def standardizing_columns_to_forecast(self,df):
+            rename_dict = {
+                            self.ds_col:self.time_col,
+                            self.y_col:self.target_col
+                            }
+            df = df.rename(columns = rename_dict)
+            return df
 
 
     def save_intermediary(self, df,filename='dataset.parquet'):
@@ -273,8 +328,11 @@ class DatasetCreator:
         """
         if self.debug:
             print("DEBUG: Iniciando pipeline de preparação de dados.")
-        df = self.read_all_csv_files()
-        df = self.correcting_dtypes(df)
+        
+        ## == MATERIAL FILES == ##
+        df = self.read_all_material_csv_files()
+        df = self.correcting_dtypes(df,source = 'enterprise')
+        df = self.clean_string_columns(df)
         df = self.stocks_removing_negatives(df)
         df = self.ajustes_preco_features(df)
         df = self.ajustar_decotes(df)
@@ -282,6 +340,21 @@ class DatasetCreator:
         df = self.drop_recent_series_with_no_training(df)
         df = self.drop_discontinued_series(df)
         df = self.remove_short_series_hierarchical(df,min_length = self.min_time_series_length)
+        
+        
+        ## == WEATHER FILES == ##
+        df_weather = self.read_all_weather_csv_files()
+        df_weather = self.correcting_dtypes(df_weather,source = 'weather')
+        df_weather = self.correcting_weather_data_names(df_weather)
+        df_weather = self.clean_string_columns(df_weather)
+        
+        ## == ENSEMBLE == ##
+        df = df.merge(df_weather,on=['mes','uf_loja','cidade_loja','bairro_loja'],how='left')
+        df.drop(columns=['latitude','longitude'],inplace=True)
+        df = self.standardizing_columns_to_forecast(df)
+        
+        ## == SAVE == #
+
         self.save_intermediary(df,filename='dataset.parquet')
         df = self.load_intermediary(filename='dataset.parquet')
 
@@ -292,3 +365,10 @@ class DatasetCreator:
 if __name__ == "__main__":
     creator = DatasetCreator()
     result = creator.run()
+
+
+
+
+
+
+      

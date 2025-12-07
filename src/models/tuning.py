@@ -30,6 +30,7 @@ class ModelTuning:
         self.optuna_pruner_cfg = get_pruner_map(config['optuna']['pruner'])
         self.optuna_n_trials_cfg = config['optuna']['n_trials']
         self.mlforecast_presets = mlforecast_params['presets']
+        self.mlforecast_fit_params = mlforecast_params['fit_params']
         self.search_lag_preset = mlforecast_params['tuning']['search_lag_preset']
         self.search_target_preset = mlforecast_params['tuning']['search_target_preset']
         self.search_date_preset = mlforecast_params['tuning']['search_date_preset']
@@ -71,7 +72,8 @@ class ModelTuning:
         return mlf_init_params
             
     def get_mlf_fit_params(self):
-        return {'static_features': []}
+        static_features = self.mlforecast_fit_params['static_features']
+        return {'static_features': static_features}
     
     def get_model_params(self, trial):
         model_params = self.fixed_params.copy()  # Cópia para evitar mutar
@@ -108,8 +110,8 @@ class ModelTuning:
         seasonality = 12
         metric_map = {
             'smape': lambda df: smape(df, models=['model'])['model'].mean(),
-            'mase':  lambda df: mase(df, models=['model'], seasonality=seasonality)['model'].mean(),
-            'rmsse': lambda df: rmsse(df, models=['model'],seasonality=12,train_df=train_df)['model'].mean(),
+            'mase':  lambda df: mase(df, models=['model'],train_df=train_df, seasonality=seasonality)['model'].mean(),
+            'rmsse': lambda df: rmsse(df, models=['model'],seasonality=seasonality,train_df=train_df)['model'].mean(),
             'rmse':  lambda df: rmse(df,models=['model'])['model'].mean()
         }
             
