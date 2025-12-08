@@ -25,12 +25,12 @@ class HierarchicalTrainTestSplit:
         
         self.time_col = config.get('time_col','ds')
         self.id_col = config.get('id_col','unique_id')
-        self.lags = config.get('lags',[])
+        self.lags = config.get('feature_engineering',{}).get('exogen_lag_features',{}).get('lags',[])
         self.holidays = config.get('features',{}).get('holiday_features',{})
         self.processed_path = config.get('paths',{}).get('data',{}).get('processed_path','data/processed')
         self.dataset_type = dataset_type
-        self.numeric_features_path = config.get('paths',{}).get('features',{}).get('numeric','features/numeric')
-        self.static_features_path = config.get('paths',{}).get('features',{}).get('static','features/static')
+        self.train_features_path = config.get('paths',{}).get('features',{}).get('train','features/train')
+        self.test_features_path = config.get('paths',{}).get('features',{}).get('test','features/test')
 
     def hierarchical_train_test_split(self,Y_df):
       """
@@ -61,7 +61,7 @@ class HierarchicalTrainTestSplit:
                 time_col=self.time_col,
                 )
        
-       Y_exogen_num_with_lags.drop(columns=before_num_features)
+       Y_exogen_num_with_lags.drop(columns=before_num_features,inplace=True)
        
        return Y_exogen_num_with_lags
        
@@ -101,20 +101,19 @@ class HierarchicalTrainTestSplit:
       
       return Y_df
     
-    def save_features(self, df, type='static', set=None,filename='numeric_features.parquet'):
+    def save_features(self, df, set='train',filename='train_features.parquet'):
         """
         Salva o dataset final em Parquet.
         """
         dataset_output_path = self.processed_path + self.dataset_type
-       
-
-        if type == 'numeric':
-            numeric_features_path =  os.path.join(dataset_output_path,self.numeric_features_path)
-            set_numeric_features_path = os.path.join(numeric_features_path,set)
-            save_path = os.path.join(set_numeric_features_path,filename)
+        if set == 'train':
+            train_features_path =  os.path.join(dataset_output_path,self.train_features_path)
+            set_train_features_path = os.path.join(train_features_path)
+            save_path = os.path.join(set_train_features_path,filename)
         else:
-            static_features_path =  os.path.join(dataset_output_path,self.static_features_path)
-            save_path = os.path.join(static_features_path,filename)
+            test_features_path =  os.path.join(dataset_output_path,self.test_features_path)
+            set_test_features_path = os.path.join(test_features_path)
+            save_path = os.path.join(set_test_features_path,filename)
 
         try:
             df.to_parquet(save_path, compression='snappy')
@@ -138,6 +137,7 @@ class HierarchicalTrainTestSplit:
        #Create Exogen Lags
        Y_exogen_num_with_lags = self.create_exog_lag_features(Y_exogen_num_df)
        
+
        #Create complete trainset
        train = (
                   train
@@ -149,12 +149,11 @@ class HierarchicalTrainTestSplit:
        test = (
                   test
                   .merge(Y_exogen_num_with_lags,on=[self.id_col,self.time_col],how='inner')
-                  .merge(Y_exogen_cat_df,on=[self.id_col],how='inner')
             )
        
-       self.save_features(Y_exogen_cat_df, type='static',filename='static_features.parquet')
-       self.save_features(train, type='numeric',set='train',filename='train_num_features.parquet')
-       self.save_features(test, type='numeric',set='test',filename='test_num_features.parquet')
+       self.save_features(Y_exogen_cat_df, set='train',filename='static_features.parquet')
+       self.save_features(train, set='train', filename='train_features.parquet')
+       self.save_features(test, set='test',filename='test_features.parquet')
 
        return train, test
 

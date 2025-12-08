@@ -234,7 +234,7 @@ class DatasetCreator:
             print(f"Filtrando nível: {current_level_cols} (>= {min_length} obs)")
             
             # Conta observações por combinação atual
-            counts = df.groupby(current_level_cols).size()
+            counts = df.drop_duplicates(current_level_cols+[self.ds_col]).groupby(current_level_cols)[self.ds_col].size()
             
             # Mantém apenas as combinações com pelo menos min_length observações
             valid_combinations = counts[counts >= min_length].index

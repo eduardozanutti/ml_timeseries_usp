@@ -52,11 +52,10 @@ class DatasetReconciliator:
         return Y_rec
     
     def run(self):
-        df_pre_processed = pd.concat([self.fitted_values,self.prediction])
        #Hierarchical reconciliation
         df_post_processed = self.reconciliate(
                                                 Y_hat_df = self.prediction,
-                                                Y_df = df_pre_processed
+                                                Y_df = self.fitted_values
                                             )
         methods_names = df_post_processed.drop(columns=['unique_id','ds',self.model_name]).columns
        #crate a plot dataframe

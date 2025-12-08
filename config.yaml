@@ -2,7 +2,7 @@
 debug: true
 remove_outliers: false
 exogen_features: false
-cache: false
+cache: true
 
 # === CONFIGURAÇÃO DOS DADOS ===
 ds_col: mes
@@ -33,14 +33,15 @@ paths:
     interim_path: data/interim/
     processed_path: data/processed/
   features:
-    numeric: features/numeric
-    static: features/static
+    train: features/train
+    test: features/test
   models:
     candidates_model_path: models/candidates
     champion_model_path: models/champion
   plots:
     plots_path: plots/
-  evaluation:
+  metrics:
+    train_path: train
     evaluation_path: evaluation
 
 min_time_series_length: 42
@@ -51,13 +52,8 @@ hierarchical_spec:
   - ['total']
   - ['total','produto']
   - ['total','produto','centro_distribuicao']
-  #- ['total','produto','centro_distribuicao',loja]
-  #- ['total','centro_distribuicao','regiao_loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material']
-  #- ['total','centro_distribuicao','regiao_loja','clima_loja','loja','produto','material','sku']
+  - ['total','produto','centro_distribuicao', loja]
+
 
 # === FEATURES ===
 features:
@@ -163,22 +159,16 @@ models:
   LightGBM:
     enabled: true
     type: mlforecast
-    regressor: LGBMRegressor
+    name: LGBMRegressor
     fixed_params:
       objective: poisson
-      #boosting_type: gbdt
-      #metric: mape
-      #bagging_freq: 1
-      #force_col_wise: true
       verbosity: -1
       n_jobs: -1
-      #seed: 42
-      #deterministic: true
 
   CatBoost:
     enabled: false
     type: mlforecast
-    regressor: CatBoostRegressor
+    name: CatBoostRegressor
     fixed_params:
       loss_function: tweedie
       eval_metric: MAPE
@@ -191,25 +181,26 @@ models:
   XGBoost:
     enabled: true
     type: mlforecast
-    regressor: XGBRegressor
+    name: XGBRegressor
     fixed_params:
       objective: count:poisson
-      eval_metric: mape
       n_jobs: -1
-      seed: 42
-      tree_method: hist
       enable_categorical: true
 
+    
+
   AutoARIMA: 
-    enabled: false
+    enabled: true
     type: statsforecast
+    name: AutoARIMA
     fixed_params:
       season_length: 12
       approximation: true
 
   AutoETS:
-    enabled: false
+    enabled: true
     type: statsforecast
+    name: AutoETS
     fixed_params:
       season_length: 12
       model: ZZZ
@@ -217,13 +208,15 @@ models:
   AutoTheta:
     enabled: false
     type: statsforecast
+    name: AutoTheta
     fixed_params:
       season_length: 12
       decomposition_type: multiplicative
 
   SeasonalNaive:
-    enabled: false
+    enabled: true
     type: statsforecast
+    name: SeasonalNaive
     fixed_params:
       season_length: 12
 
@@ -242,22 +235,24 @@ parameter_space:
       min_data_in_leaf: {param: min_data_in_leaf,low: 5, high: 20}
       n_estimators: {param: n_estimators, low: 300, high: 3000}
 
-  CatBoost:
-    learning_rate: {low: 0.01, high: 0.3, log: true}
-    iterations: {low: 500, high: 5000, log: true}
-    depth: {low: 4, high: 12}
-    l2_leaf_reg: {low: 1, high: 10, log: true}
-    bagging_temperature: {low: 0.0, high: 1.0}
+  #CatBoost:
+  #  learning_rate: {low: 0.01, high: 0.3, log: true}
+  #  iterations: {low: 500, high: 5000, log: true}
+  #  depth: {low: 4, high: 12}
+  #  l2_leaf_reg: {low: 1, high: 10, log: true}
+  #  bagging_temperature: {low: 0.0, high: 1.0}
 
   XGBoost:
-    learning_rate: {low: 0.01, high: 0.3, log: true}
-    n_estimators: {low: 500, high: 5000, log: true}
-    max_depth: {low: 3, high: 15}
-    min_child_weight: {low: 1, high: 100, log: true}
-    subsample: {low: 0.6, high: 1.0}
-    colsample_bytree: {low: 0.6, high: 1.0}
-    reg_alpha: {low: 1e-8, high: 10.0, log: true}
-    reg_lambda: {low: 1e-8, high: 10.0, log: true}
+    float:
+      learning_rate: {param: learning_rate, low: 0.01, high: 0.3}
+      subsample: {param: subsample, low: 0.6, high: 1.0}
+      colsample_bytree: {param: colsample_bytree, low: 0.6, high: 1.0}
+      gamma: {param: gamma, low: 5, high: 9, log: true}
+    int:
+      max_depth:  {param: max_depth, low: 3, high: 10}
+      n_estimators: {param: n_estimators, low: 300, high: 3000}
+      min_child_weight: {param: min_child_weight, low: 1, high: 100, log: true}
+      
 
 # === PRESETS DE FEATURES ===
 modeling:
@@ -365,6 +360,8 @@ modeling:
       metric: rmse
       n_trials: 100
       timeout: 14400
+
+
 evaluation:
   scaled_metrics:
     - rmsse
@@ -396,7 +393,7 @@ optuna:
   pruner:
     type: MedianPruner
     n_startup_trials: 40
-  metric: rmsse
+  metric: mase
 
 # ==  COORDENATES == 
 coordenates:
