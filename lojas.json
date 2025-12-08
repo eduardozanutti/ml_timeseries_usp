@@ -1,0 +1,1412 @@
+[
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "GOES CALMON"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "PAPICU"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "SAPIRANGA"
+  },
+  {
+    "uf_loja": "AL",
+    "cidade_loja": "ALAGOAS",
+    "bairro_loja": "CRUZ DAS ALMAS"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "JEREISSATI II"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "PIEDADE"
+  },
+  {
+    "uf_loja": "AL",
+    "cidade_loja": "ALAGOAS",
+    "bairro_loja": "SANTA EDWIGES"
+  },
+  {
+    "uf_loja": "RN",
+    "cidade_loja": "RIO GRANDE DO NORTE",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SE",
+    "cidade_loja": "SERGIPE",
+    "bairro_loja": "JARDINS"
+  },
+  {
+    "uf_loja": "SE",
+    "cidade_loja": "SERGIPE",
+    "bairro_loja": "DIS"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "PARQUE VERDE"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "SANTO ANTONIO"
+  },
+  {
+    "uf_loja": "PB",
+    "cidade_loja": "PARAIBA",
+    "bairro_loja": "CATOLE"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "COQUEIROS"
+  },
+  {
+    "uf_loja": "AL",
+    "cidade_loja": "ALAGOAS",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "RN",
+    "cidade_loja": "RIO GRANDE DO NORTE",
+    "bairro_loja": "NOVA BETANIA"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "NUCLEO RES E SERVICOS CARAJAS"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "REDUTO"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "VILA DA FABRICA"
+  },
+  {
+    "uf_loja": "PI",
+    "cidade_loja": "PIAUI",
+    "bairro_loja": "CABRAL"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "PI",
+    "cidade_loja": "PIAUI",
+    "bairro_loja": "NOIVOS"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "CASA CAIADA"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "SANTO AMARO"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "CAMINHO DAS ARVORES"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "AL",
+    "cidade_loja": "ALAGOAS",
+    "bairro_loja": "CIDADE UNIVERSITARIA"
+  },
+  {
+    "uf_loja": "AP",
+    "cidade_loja": "AMAPA",
+    "bairro_loja": "UNIVERSIDADE"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "SARAMANTA"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "CRUZEIRO DO ANIL"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "PRESIDENTE KENNEDY"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "BENFICA"
+  },
+  {
+    "uf_loja": "SE",
+    "cidade_loja": "SERGIPE",
+    "bairro_loja": "COROA DO MEIO"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "CABULA"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "PARALELA"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "JOQUEI CLUBE"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "SAO JOAO"
+  },
+  {
+    "uf_loja": "PB",
+    "cidade_loja": "PARAIBA",
+    "bairro_loja": "BELA VISTA"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "JARACATY"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "CANDEIAS"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "SANTARENZINHO"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "TRIANGULO"
+  },
+  {
+    "uf_loja": "AL",
+    "cidade_loja": "ALAGOAS",
+    "bairro_loja": "MANGABEIRA"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "NOVA MARABA"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "BOA VISTA"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "BOA VIAGEM"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "REDENCAO"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "MAURICIO DE NASSAU"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "PARANGABA"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "PIEDADE"
+  },
+  {
+    "uf_loja": "SE",
+    "cidade_loja": "SERGIPE",
+    "bairro_loja": "INDUSTRIAL"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "CASTANHEIRA"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "PINA"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "COHAMA"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "SAO CRISTOVAO"
+  },
+  {
+    "uf_loja": "PI",
+    "cidade_loja": "PIAUI",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "AP",
+    "cidade_loja": "AMAPA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "INDIANOPOLIS"
+  },
+  {
+    "uf_loja": "PB",
+    "cidade_loja": "PARAIBA",
+    "bairro_loja": "MANGABEIRA"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "BATISTA CAMPOS"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "BARRA"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "FELICIA"
+  },
+  {
+    "uf_loja": "PA",
+    "cidade_loja": "PARA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "RN",
+    "cidade_loja": "RIO GRANDE DO NORTE",
+    "bairro_loja": "TIROL"
+  },
+  {
+    "uf_loja": "PI",
+    "cidade_loja": "PIAUI",
+    "bairro_loja": "REIS VELOSO"
+  },
+  {
+    "uf_loja": "PB",
+    "cidade_loja": "PARAIBA",
+    "bairro_loja": "TAMBIA"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "BELA VISTA"
+  },
+  {
+    "uf_loja": "MA",
+    "cidade_loja": "MARANHAO",
+    "bairro_loja": "CALHAU"
+  },
+  {
+    "uf_loja": "SE",
+    "cidade_loja": "SERGIPE",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "RN",
+    "cidade_loja": "RIO GRANDE DO NORTE",
+    "bairro_loja": "POTENGI"
+  },
+  {
+    "uf_loja": "PE",
+    "cidade_loja": "PERNAMBUCO",
+    "bairro_loja": "CIDADE GARAPU"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "DOM EXPEDITO"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "AGUA FRIA"
+  },
+  {
+    "uf_loja": "CE",
+    "cidade_loja": "CEARA",
+    "bairro_loja": "SAO GERARDO"
+  },
+  {
+    "uf_loja": "PB",
+    "cidade_loja": "PARAIBA",
+    "bairro_loja": "MANAIRA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "APARECIDA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PARAISO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PERDIZES"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "IPIRANGA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM SANTA GENEBRA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "GUANABARA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "TAMBORE"
+  },
+  {
+    "uf_loja": "MS",
+    "cidade_loja": "MATO GROSSO DO SUL",
+    "bairro_loja": "CORONEL ANTONIO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "CENTRO HISTORICO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "AREAL"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "PARQUE RESIDENCIAL SAO PEDRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "EURICO SALLES"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM FLOR DA MONTANHA"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "Q. PAINEIRAS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JD. AMERICA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM PAULISTA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA YARA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM BRITANIA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "CIDADE NOVA"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "TAGUATINGA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "BAIRRO DA LUZ"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM PIRITUBA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "BARREIRO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "VILA CLORIS"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "BELVEDERE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM MADALENA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PARADA INGLESA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SANTA EFIGENIA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SAO PAULO"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "JARDIM SULACAP"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA GUILHERME"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM DAS ROSAS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM ARMENIA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "NOSSA SENHORA DA SALETE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "BELA VISTA"
+  },
+  {
+    "uf_loja": "MS",
+    "cidade_loja": "MATO GROSSO DO SUL",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA ALMEIDA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "DISTRITO INDUSTRIAL"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "PILARES"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "PASSO D AREIA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SANTA MONICA"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "INDUSTRIAL"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "VILA DA PENHA"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "SAO FRANCISCO"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "MS",
+    "cidade_loja": "MATO GROSSO DO SUL",
+    "bairro_loja": "PORTAL DAS ARARAS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM SANTA CECILIA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "DOS ESTADOS"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "MADUREIRA"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "ASA NORTE"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "TAQUATINGA"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "JARDIM DAS AMERICAS"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "TARUMA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "CAMPO NOVO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "CRISTAL"
+  },
+  {
+    "uf_loja": "RO",
+    "cidade_loja": "RONDONIA",
+    "bairro_loja": "FLODOALDO PONTES PINTO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SAO PEDRO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "CAICARA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "VILA IBIRAPITANGA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM TROPICAL"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA ARICANDUVA"
+  },
+  {
+    "uf_loja": "TO",
+    "cidade_loja": "TOCANTINS",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA REAL"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "ANDARAI"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "SAO GERALDO"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "PARAISO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "RESSACA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "SITIO DO CAMPO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "RESIDENCIAL ECO VILLAGE I"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "JOCKEY DE ITAPARICA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA CAMPANELA"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "PRAIA DE BELAS"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "SETOR SERRA DOURADA - 4A ETAPA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SAO JOAO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM DO LAGO"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "SETOR INDUSTRIAL"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA AREIAO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "RENASENCA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "NOSSA SENHORA DO PERPETUO SOCORRO"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "ASA SUL011"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "PARQUE LEOPOLDINA"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "CENTRO DE VILA VELHA"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "QUADRA26 LOTE 15"
+  },
+  {
+    "uf_loja": "MS",
+    "cidade_loja": "MATO GROSSO DO SUL",
+    "bairro_loja": "SANTA FE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "LAUZANE PAULISTA"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "ZONA 01"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "COLINA DE LARANJEIRAS"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "JARDIM ALVORADA"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "TAGUATINGA NORTE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "INDIANOPOLIS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARIDM BARONESA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "OLARIAS"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SANTA CLARA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "CHACARA DAS FLORES"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM SATELITE"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "RECREIO DOS BANDEIRANTES"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "MORUMBI"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PARQUE MORUMBI"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "SACO GRANDE"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "PRAIA DA COSTA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM CALIFORNIA"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "SETOR JARDIM GOIAS"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "JARDIM PETROPOLIS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "ITAPEGICA VILA HERMINIA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM UMUARAMA"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "JARDIM AEROPORTO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "HELENA"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "INGA ALTO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "VILA RODRIGUES"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "HORTO"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "RESIDENCIAL JARDIM CAMPESTRE"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "AGUA VERDE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM BANDEIRANTES"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "SALTO NORTE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "LAGEADINHO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "CIDADE INDUSTRIAL"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM IPAUSSURAMA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "BARRA DA TIJUCA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM REDENTOR"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "GUARUJA"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "DOM AQUINO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "SAO BENEDITO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "MORADA DA COLINA"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "CRISTO REDENTOR"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA OLIMPIA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "CAMPO GRANDE"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "MANSOES CENTRO OESTE"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "IPANEMA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "BOM RETIRO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "CONSOLACAO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "MOSSUNGUE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM ANALIA FRANCO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "PASSO DAS PEDRAS"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "MOVELAR"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "RIBEIRANIA"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "AEROPORTO"
+  },
+  {
+    "uf_loja": "BA",
+    "cidade_loja": "BAHIA",
+    "bairro_loja": "VILA VERDE"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "BARREIROS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA PRUDENTE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PIRITUBA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VARJAO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "ZONA III"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "TAQUARA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "PARQUE DUQUE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "JARDIM MOLLON"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "GLEBA FAZENDA PALHANO"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "CAPUAVA"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "PARQUE INDUSTRIAL BANDEIRANTES"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PINHEIROS"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "DEL CASTILHO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "SAO LUIZ"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA BOA ESPERANCA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "CABO FRIO"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "CIDADE DOS LAGOS"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "MT",
+    "cidade_loja": "MATO GROSSO",
+    "bairro_loja": "BOSQUE DA SAUDE"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "REGIAO DO LAGO"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "FAZENDA CAVEIRAS"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "NOVA ALDEINHA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "ANHANGABAU"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PEDRO CAVALINI"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "VENDA VELHA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA FAUSTO NEVES MORELLI"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "ANIL"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "AGUA BRANCA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA SILVIANIA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA MARLENE"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA DO GOLF"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "AEROVIARIO"
+  },
+  {
+    "uf_loja": "MG",
+    "cidade_loja": "MINAS GERAIS",
+    "bairro_loja": "MARIANO PROCOPIO"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "PARQUE FABER CASTELL I"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "VILA SAO TOMAZ"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "ESTACAO"
+  },
+  {
+    "uf_loja": "AC",
+    "cidade_loja": "ACRE",
+    "bairro_loja": "DIST INDUSTRIAL"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "PARQUE ESPLANADA III"
+  },
+  {
+    "uf_loja": "DF",
+    "cidade_loja": "BRASILIA",
+    "bairro_loja": "SETOR AREA ISOL SUDOE."
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "SANTO AMARO"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "ALCANTARA"
+  },
+  {
+    "uf_loja": "PR",
+    "cidade_loja": "PARANA",
+    "bairro_loja": "VILA YOLANDA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "BOTAFOGO"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "PASSO DA AREIA"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "SC",
+    "cidade_loja": "SANTA CATARINA",
+    "bairro_loja": "LIDER"
+  },
+  {
+    "uf_loja": "ES",
+    "cidade_loja": "ESPIRITO SANTO",
+    "bairro_loja": "ENSEADA DO SUA"
+  },
+  {
+    "uf_loja": "RJ",
+    "cidade_loja": "RIO DE JANEIRO",
+    "bairro_loja": "BANGU"
+  },
+  {
+    "uf_loja": "RS",
+    "cidade_loja": "RIO GRANDE DO SUL",
+    "bairro_loja": "MARECHAL RONDON"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "VILA BRANDINA"
+  },
+  {
+    "uf_loja": "SP",
+    "cidade_loja": "SAO PAULO",
+    "bairro_loja": "CERAMICA"
+  },
+  {
+    "uf_loja": "GO",
+    "cidade_loja": "GOIAS",
+    "bairro_loja": "SETOR BUENO"
+  },
+  {
+    "uf_loja": "RR",
+    "cidade_loja": "RORAIMA",
+    "bairro_loja": "CACARI"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "MONTE DAS OLIVEIRAS"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "CHAPADA"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "ADRIANOPOLIS"
+  },
+  {
+    "uf_loja": "RR",
+    "cidade_loja": "RORAIMA",
+    "bairro_loja": "AEROPORTO"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "CENTRO"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "SAO JOSE OPERARIO"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "PONTA NEGRA"
+  },
+  {
+    "uf_loja": "AM",
+    "cidade_loja": "AMAZONAS",
+    "bairro_loja": "CIDADE NOVA"
+  }
+]

@@ -12,6 +12,7 @@ from src.utils.presets import build_lag_transforms, build_target_transforms
 from src.utils.optuna_presets import get_sampler_map, get_pruner_map
 from src.utils.model_registry import get_model_class
 import logging
+from src.evaluation.metrics import get_metric
 
 class ModelTuning:
     def __init__(self, df, config, model_name,fixed_params,param_space,cv_config,mlforecast_params,tuning_metric):
@@ -30,6 +31,7 @@ class ModelTuning:
         self.optuna_pruner_cfg = get_pruner_map(config['optuna']['pruner'])
         self.optuna_n_trials_cfg = config['optuna']['n_trials']
         self.mlforecast_presets = mlforecast_params['presets']
+        self.mlforecast_fit_params = mlforecast_params['fit_params']
         self.search_lag_preset = mlforecast_params['tuning']['search_lag_preset']
         self.search_target_preset = mlforecast_params['tuning']['search_target_preset']
         self.search_date_preset = mlforecast_params['tuning']['search_date_preset']
@@ -38,6 +40,8 @@ class ModelTuning:
         self.active_target_preset = mlforecast_params['tuning']['active_target_preset']
         self.active_date_preset = mlforecast_params['tuning']['active_date_preset']
         self.tuning_metric = tuning_metric
+        self.seasonality = config['seasonality']
+        self.scaled_metrics = config['evaluation']['scaled_metrics']
         logging.basicConfig(level=logging.DEBUG)  # No init ou global
 
     def get_mlf_init_params(self):
@@ -71,7 +75,8 @@ class ModelTuning:
         return mlf_init_params
             
     def get_mlf_fit_params(self):
-        return {'static_features': []}
+        static_features = self.mlforecast_fit_params['static_features']
+        return {'static_features': static_features}
     
     def get_model_params(self, trial):
         model_params = self.fixed_params.copy()  # Cópia para evitar mutar
@@ -104,16 +109,21 @@ class ModelTuning:
      
     
     def loss(self,cv_df, train_df=None):
-        train_df = self.df
-        seasonality = 12
-        metric_map = {
-            'smape': lambda df: smape(df, models=['model'])['model'].mean(),
-            'mase':  lambda df: mase(df, models=['model'], seasonality=seasonality)['model'].mean(),
-            'rmsse': lambda df: rmsse(df, models=['model'],seasonality=12,train_df=train_df)['model'].mean(),
-            'rmse':  lambda df: rmse(df,models=['model'])['model'].mean()
-        }
-            
-        return metric_map[self.tuning_metric](cv_df)
+        if self.tuning_metric in self.scaled_metrics:
+            return get_metric(
+                        df = cv_df,
+                        metric_name = self.tuning_metric,
+                        model_name = 'model', #padrao nixtla
+                        seasonality = self.seasonality,
+                        train_df = self.df
+                        )
+        else:
+            return get_metric(
+                        df = cv_df,
+                        metric_name = self.tuning_metric,
+                        model_name = 'model' #padrao nixtla
+                        )
+         
     
     def create_objetive(self):
         

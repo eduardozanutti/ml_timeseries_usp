@@ -1,27 +1,26 @@
 {
-    "main_metric": 0.7314662871310205,
+    "main_metric": 0.8631537827760075,
     "metrics": {
         "model": "LGBMRegressor",
-        "rmse": 234.8638226075505,
-        "rmsse": 0.7314662871310205,
-        "mase": 0.7724717316763842,
-        "smape": 0.30456072457630107,
-        "wrmsse": 0.0,
+        "mase": 0.8501803374303509,
+        "rmsse": 0.7863220515498098,
+        "smape": 0.23937978785496536,
+        "nd": 0.4516669299774368,
         "notes": "cv_results"
     },
     "model_params": {
         "objective": "poisson",
         "verbosity": -1,
         "n_jobs": -1,
-        "learning_rate": 0.011552609520026576,
-        "feature_fraction": 0.8580945732187625,
-        "bagging_fraction": 0.9266415740122277,
-        "lambda_l1": 3.1982428566503605e-07,
-        "lambda_l2": 0.00012481658849905204,
-        "num_leaves": 64,
+        "learning_rate": 0.012727297529466563,
+        "feature_fraction": 0.8177390268694369,
+        "bagging_fraction": 0.927678748643049,
+        "lambda_l1": 7.238416292554983e-06,
+        "lambda_l2": 0.00025240672871712597,
+        "num_leaves": 25,
         "max_depth": 3,
-        "min_data_in_leaf": 19,
-        "n_estimators": 1288
+        "min_data_in_leaf": 12,
+        "n_estimators": 1883
     },
     "mlf_params": {
         "lags": [
@@ -53,6 +52,24 @@
         ]
     },
     "mlf_fit_params": {
-        "static_features": []
+        "static_features": [
+            "unique_id",
+            "marca",
+            "material",
+            "construcao",
+            "padronagem",
+            "decote",
+            "detalhe",
+            "regiao_loja",
+            "uf_loja",
+            "clima_loja",
+            "perfil_loja",
+            "porte_loja",
+            "sku",
+            "tamanho",
+            "cidade_loja",
+            "bairro_loja",
+            "cor"
+        ]
     }
 }

@@ -1,0 +1,12 @@
+{
+    "main_metric": null,
+    "metrics": {
+        "model": "AutoARIMA",
+        "mase": 0.9342302475063207,
+        "rmsse": 0.8922453111017893,
+        "smape": 0.27624058723449707,
+        "nd": 0.47333091497421265,
+        "notes": "cv_results"
+    },
+    "model_params": null
+}

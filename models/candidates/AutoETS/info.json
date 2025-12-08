@@ -1,0 +1,12 @@
+{
+    "main_metric": null,
+    "metrics": {
+        "model": "AutoETS",
+        "mase": 1.002326637801727,
+        "rmsse": 0.9643319530899171,
+        "smape": 0.3005877733230591,
+        "nd": 0.4935135841369629,
+        "notes": "cv_results"
+    },
+    "model_params": null
+}

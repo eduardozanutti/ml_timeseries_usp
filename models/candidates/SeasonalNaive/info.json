@@ -1,0 +1,12 @@
+{
+    "main_metric": null,
+    "metrics": {
+        "model": "SeasonalNaive",
+        "mase": 1.4395930585351295,
+        "rmsse": 1.2375179044223417,
+        "smape": 0.47188717126846313,
+        "nd": 0.6981955766677856,
+        "notes": "cv_results"
+    },
+    "model_params": null
+}
