@@ -1,73 +1,46 @@
 {
-    "main_metric": 0.9365228363588219,
+    "main_metric": 0.5802101802178236,
     "metrics": {
         "model": "XGBRegressor",
-        "mase": 0.9271837593135605,
-        "rmsse": 0.8960252999242059,
-        "smape": 0.2569364287785639,
-        "nd": 0.4794560489250579,
+        "mase": 1.0829565521728564,
+        "rmsse": 1.0134770289535822,
+        "smape": 0.3204213017148025,
+        "nd": 0.5364926246626328,
         "notes": "cv_results"
     },
     "model_params": {
-        "objective": "count:poisson",
-        "n_jobs": -1,
-        "enable_categorical": true,
-        "learning_rate": 0.1273225004027454,
-        "subsample": 0.9758906615777415,
-        "colsample_bytree": 0.9344538672049448,
-        "gamma": 6.357377483086561,
-        "max_depth": 3,
-        "n_estimators": 458,
-        "min_child_weight": 53
+        "eta": 0.08040493529216956,
+        "objective": "reg:squarederror",
+        "n_jobs": 2,
+        "verbosity": 0,
+        "tree_method": "hist",
+        "n_estimators": 612,
+        "max_depth": 9,
+        "reg_alpha": 0.061006715432203505,
+        "reg_lambda": 0.01011687319252222,
+        "subsample": 0.9302228090919306,
+        "colsample_bytree": 0.9319853415264213,
+        "enable_categorical": true
     },
     "mlf_params": {
         "lags": [
             1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            12
+            13
         ],
         "lag_transforms": {
-            "1": "expanding_mean",
-            "6": [
-                "rolling_mean_3",
-                "rolling_mean_6"
-            ],
-            "12": [
-                "expanding_mean",
-                "rolling_mean_3"
-            ]
+            "1": "rolling_mean_13"
         },
-        "target_transforms": [],
+        "target_transforms": [
+            "standard_scaler"
+        ],
         "date_features": [
             "month",
-            "quarter",
-            "is_month_start",
-            "is_month_end"
+            "quarter"
         ]
     },
     "mlf_fit_params": {
         "static_features": [
-            "unique_id",
-            "marca",
-            "material",
-            "construcao",
-            "padronagem",
-            "decote",
-            "detalhe",
-            "regiao_loja",
-            "uf_loja",
-            "clima_loja",
-            "perfil_loja",
-            "porte_loja",
-            "sku",
-            "tamanho",
-            "cidade_loja",
-            "bairro_loja",
-            "cor"
+            "unique_id"
         ]
     }
 }

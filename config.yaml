@@ -161,7 +161,7 @@ models:
     type: mlforecast
     name: LGBMRegressor
     fixed_params:
-      objective: poisson
+      objective: lr
       verbosity: -1
       n_jobs: -1
 
@@ -224,16 +224,16 @@ models:
 parameter_space:
   LightGBM:
     float:
-      learning_rate: {param: learning_rate, low: 0.01, high: 0.3, log: true}
-      feature_fraction: {param: feature_fraction, low: 0.7, high: 1.0} 
-      bagging_fraction: {param: bagging_fraction, low: 0.7, high: 1.0}
-      lambda_l1: {param: lambda_l1, low: 1e-8, high: 1.0, log: true}
-      lambda_l2: {param: lambda_l2, low: 1e-8,high: 1.0, log: true}
+      learning_rate: {param: learning_rate, low: 0.01, high: 0.1}
+      feature_fraction: {param: feature_fraction, low: 0.75, high: 1.0} 
+      bagging_fraction: {param: bagging_fraction, low: 0.75, high: 1.0}
+      lambda_l1: {param: lambda_l1, low: 0.01, high: 10, log: true}
+      lambda_l2: {param: lambda_l2, low: 0.01,high: 10, log: true}
     int:
-      num_leaves: {param: num_leaves, low: 8, high: 64}
-      max_depth:  {param: max_depth, low: 3, high: 10}
-      min_data_in_leaf: {param: min_data_in_leaf,low: 5, high: 20}
-      n_estimators: {param: n_estimators, low: 300, high: 3000}
+      num_leaves: {param: num_leaves, low: 31, high: 1024}
+      #max_depth:  {param: max_depth, low: 3, high: 10}
+      #min_data_in_leaf: {param: min_data_in_leaf,low: 5, high: 20}
+      n_estimators: {param: n_estimators, low: 10, high: 1000}
 
   #CatBoost:
   #  learning_rate: {low: 0.01, high: 0.3, log: true}
@@ -323,6 +323,30 @@ modeling:
             3: [rolling_mean_3]
             6: [expanding_mean, rolling_mean_3, rolling_mean_6]
             12: [expanding_mean, rolling_mean_3, rolling_mean_6]
+        super:
+          lags: [[1],[13],[1,13],range(1,33)]
+          candidate_lag_tfms:
+            - 1:
+                - rolling_mean_13
+            - 1:
+                - rolling_mean_13
+              13:
+                - rolling_mean_13
+            - 13:
+                - rolling_mean_13
+            - 4:
+                - expanding_mean
+                - rolling_mean_4
+              8:
+                - expanding_mean
+                - rolling_mean_4
+          candidate_targ_tmfs:
+            - [differences_1]
+            - [local_boxcox]
+            - [local_standard_scaler]
+            - [local_boxcox,differences_1]
+            - [local_boxcox, local_standard_scaler]
+            - [local_boxcox,differences_1,local_standard_scaler]
 
       # === PRESETS DO TARGET ===
       target_transforms:
