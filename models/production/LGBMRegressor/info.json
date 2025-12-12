@@ -1,0 +1,63 @@
+{
+    "main_metric": 0.578659517397286,
+    "metrics": {
+        "model": "LGBMRegressor",
+        "mase": 1.0861212712459651,
+        "rmsse": 1.0066777055006237,
+        "smape": 0.319143190434896,
+        "nd": 0.5279438144652718,
+        "notes": "cv_results"
+    },
+    "model_params": {"learning_rate": 0.07391965556357367,
+    "objective": "regression",
+    "bagging_freq": 1,
+    "num_threads": 2,
+    "verbose": -1,
+    "force_col_wise": "True",
+    "n_estimators": 23,
+    "num_leaves": 239,
+    "lambda_l1": 3.914039930729276,
+    "lambda_l2": 0.14810932329232987,
+    "bagging_fraction": 0.9298269195559123,
+    "feature_fraction": 0.9295494005489191
+},
+    "mlf_params": {
+        "lags": [
+            1,
+            13
+        ],
+        "lag_transforms": {
+            "1": "rolling_mean_13"
+        },
+        "target_transforms": [
+            "standard_scaler"
+        ],
+        "date_features": [
+            "month",
+            "quarter"
+        ]
+    },
+    "mlf_fit_params": {
+        "static_features": [
+            "unique_id",
+            "marca",
+            "material",
+            "construcao",
+            "padronagem",
+            "decote",
+            "detalhe",
+            "regiao_loja",
+            "uf_loja",
+            "clima_loja",
+            "perfil_loja",
+            "porte_loja",
+            "sku",
+            "tamanho",
+            "cidade_loja",
+            "bairro_loja",
+            "cor"
+        ]
+                                        
+    
+    }
+}
